@@ -43,7 +43,7 @@
       },
       {
         title: "Quản lý bệnh",
-        path: "disease",
+        path: "disease-record",
         icon: <MdOutlineMedicalInformation />,
       },
       {

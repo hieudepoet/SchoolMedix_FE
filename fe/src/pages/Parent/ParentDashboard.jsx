@@ -3,7 +3,6 @@ import { Heart, Calendar, Activity, Pill, Syringe, BarChart3 } from "lucide-reac
 import { Services } from "../../components/Services";
 import axiosClient from "../../config/axiosClient";
 import { getUser } from "../../service/authService";
-import Header from "../../components/Header";
 
 const ParentDashboard = () => {
   const [selectedChild, setSelectedChild] = useState(() => {
@@ -90,7 +89,6 @@ const ParentDashboard = () => {
 
   return (
     <div>
-      <Header />
       <div className="min-h-screen bg-gray-50 p-6">
         {/* Children List */}
         <div className="mb-8">
@@ -175,3 +173,102 @@ const ParentDashboard = () => {
 };
 
 export default ParentDashboard;
+
+
+
+
+
+
+
+// import { useState } from "react";
+// import { Heart, Calendar, Activity, Pill, Syringe, BarChart3 } from "lucide-react";
+// import { Services } from "../../components/Services";
+// // import Header from "../../components/Header";
+// // import TabHeader from "../../components/TabHeader";
+
+// const ParentDashboard = () => {
+//   const [selectedChild, setSelectedChild] = useState(() => {
+//     const savedChild = localStorage.getItem("selectedChild");
+//     return savedChild ? JSON.parse(savedChild) : null;
+//   });
+
+//   const services = [
+//     {
+//       icon: <Syringe className="w-8 h-8 text-green-600" />,
+//       title: "Tiêm Chủng",
+//       description: "Theo dõi và cập nhật lịch tiêm chủng",
+//       path: selectedChild ? `/parent/edit/${selectedChild.id}/vaccine-info` : "#",
+//     },
+//     {
+//       icon: <Heart className="w-8 h-8 text-red-600" />,
+//       title: "Khám sức khỏe định kỳ",
+//       description: "Lịch khám và kết quả khám định kỳ",
+//       path: selectedChild ? `/parent/edit/${selectedChild.id}/regular-checkup` : "#",
+//     },
+//     {
+//       icon: <Activity className="w-8 h-8 text-blue-600" />,
+//       title: "Sức khỏe hằng ngày",
+//       description: "Các khảo sát về tình trạng sức khỏe",
+//       path: selectedChild ? `/parent/edit/${selectedChild.id}/health-record` : "#",
+//     },
+//     {
+//       icon: <Pill className="w-8 h-8 text-purple-600" />,
+//       title: "Gửi thuốc cho nhà trường",
+//       description: "Đăng ký và theo dõi thuốc tại trường",
+//       info: "1 đơn thuốc đang chờ xác nhận",
+//       path: selectedChild ? `/parent/edit/${selectedChild.id}/drug-table` : "#",
+//     },
+//     {
+//       icon: <Calendar className="w-8 h-8 text-orange-600" />,
+//       title: "Tổng quan sức khỏe",
+//       description: "Xem tổng quan sức khỏe và lịch sử",
+//       path: selectedChild ? `/parent/edit/${selectedChild.id}/health-record` : "#",
+//     },
+//     // {
+//     //   icon: <BarChart3 className="w-8 h-8 text-cyan-600" />,
+//     //   title: "Báo cáo sức khỏe",
+//     //   description: "Xem báo cáo tổng quan sức khỏe",
+//     //   path: selectedChild ? `/parent/edit/${selectedChild.id}/health-check` : "#",
+//     // },
+//   ];
+
+//   const handleChildSelect = (child) => {
+//     setSelectedChild(child);
+//   };
+
+//   return (
+//     <div>
+//       {/* <Header /> */}
+//       <div className="min-h-screen bg-gray-50 p-6">
+//         {/* Children Selector Component */}
+//         {/* <ChildrenSelector 
+//           selectedChild={selectedChild} 
+//           onChildSelect={handleChildSelect} 
+//         /> */}
+
+//         {/* Services Section */}
+//         <div className="bg-white rounded-lg shadow-sm p-6">
+//           <h2 className="text-xl font-semibold text-gray-800 mb-6">
+//             Hồ sơ của{" "}
+//             {selectedChild ? `${selectedChild.profile?.name}` : ""}
+//           </h2>
+
+//           {selectedChild ? (
+//             <Services services={services} />
+//           ) : (
+//             <div className="text-center py-12">
+//               <p className="text-gray-500 mb-2">
+//                 Vui lòng chọn một đứa trẻ để xem dịch vụ
+//               </p>
+//               <p className="text-sm text-gray-400">
+//                 Chọn tên con em từ danh sách phía trên
+//               </p>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default ParentDashboard;

@@ -27,6 +27,7 @@ import RegularCheckup from "../pages/Admin&Nurse/RegularCheckup";
 import StudentRegularCheckup from "../pages/Parent/StudentRegularCheckup";
 import DiseaseRecordManagement from "../pages/Admin&Nurse/DiseaseRecordManagement";
 import VaccineRecordsInfo from "../pages/Parent/VaccineRecordsInfo";
+import DiseaseRecordOfChildrenManagement from "../pages/Parent/DiseaseRecordofChildrenManagement";
 
 const routes = createBrowserRouter([
   {
@@ -97,24 +98,83 @@ const routes = createBrowserRouter([
           },
           
           {
-            path: "disease",
+            path: "disease-record",
             element: <DiseaseRecordManagement/>
           }
         ],
       },
     ],
   },
+  // Code Parent cũ
+  // {
+  //   path: "/parent",
+  //   element: <PrivateRoute allowedRoles={["parent"]} currentRole={"parent"} />,
+  //   children: [
+  //     {
+  //       path: "",
+  //       element: <ParentLayout />,
+  //     },
+  //     {
+  //       path: "edit",
+  //       element: <ParentDashboard />,
+  //     },
+  //     {
+  //       path: "edit/:student_id",
+  //       element: <ParentLayout />,
+  //       children: [
+  //         {
+  //           path: "survey/:campaign_id",
+  //           element: <Survey/>
+  //         },
+  //         {
+  //           path: "health-profile",
+  //           element: <HealthProfile />,
+  //         },
+  //         {
+  //           path: "drug-table",
+  //           element: <DrugTable />,
+  //         },
+  //         {
+  //           path: "send-drug-form",
+  //           element: <SendDrugForm />,
+  //         },
+  //         {
+  //           path: "vaccine-info",
+  //           element: <VaccineInfo />,
+  //         },
+  //         {
+  //           path: "health-record",
+  //           element: <HealthRecord/>
+  //         },
+  //         {
+  //           path: "regular-checkup",
+  //           element: <StudentRegularCheckup/>
+  //         },
+  //         {
+  //           path: "disease-record",
+  //           element: <DiseaseRecordOfChildrenManagement/>
+  //         }
+  //       ],
+  //     },
+  //   ],
+  // },
   {
     path: "/parent",
     element: <PrivateRoute allowedRoles={["parent"]} currentRole={"parent"} />,
     children: [
       {
         path: "",
-        element: <ParentDashboard />,
-      },
-      {
-        path: "edit",
-        element: <ParentDashboard />,
+        element: <ParentLayout />,
+        children: [
+          {
+            path: "",
+            element: <ParentDashboard />
+          },
+          {
+            path: "edit",
+            element: <ParentDashboard />
+          }
+        ]
       },
       {
         path: "edit/:student_id",
@@ -147,10 +207,14 @@ const routes = createBrowserRouter([
           {
             path: "regular-checkup",
             element: <StudentRegularCheckup/>
+          },
+          {
+            path: "disease-record",
+            element: <DiseaseRecordOfChildrenManagement/>
           }
-        ],
-      },
-    ],
+        ]
+      }
+    ]
   },
   {
     path: "/nurse",
