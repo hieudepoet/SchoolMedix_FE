@@ -41,7 +41,7 @@ const VaccineInfo = () => {
       </div>
 
       {activeTab === "campaigns" && <VaccineCampaignsInfo currChild={currChild} navigate={navigate} />}
-      {activeTab === "records" && <VaccineRecordsInfo />}
+      {activeTab === "records" && <VaccineRecordsInfo currChild={currChild}/>}
     </div>
   );
 };

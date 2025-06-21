@@ -1,134 +1,4 @@
-// import React, { useState, useEffect } from 'react';
-// import axiosClient from '../../config/axiosClient';
-// import DiseaseRecordIdList from './DiseaseRecordIdList';
-// import AddDiseaseRecord from './AddDiseaseRecord';
-
-// const DiseaseRecordManagement = () => {
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [categoryFilter, setCategoryFilter] = useState('Bệnh truyền nhiễm' ); // 'Bệnh truyền nhiễm', or 'Bệnh mãn tính'
-//   const [showAddForm, setShowAddForm] = useState(false);
-//   const [records, setRecords] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     const fetchRecords = async () => {
-//       setLoading(true);
-//       try {
-//         if (!categoryFilter) {
-//           setRecords([]);
-//           setLoading(false);
-//           return;
-//         }
-//         //const endpoint = categoryFilter === 'Bệnh truyền nhiễm' ? '/infectious-record' : '/chronic-record';
-//         let endpoint = '';
-//         if (categoryFilter === 'Bệnh truyền nhiễm') {
-//           endpoint = '/infectious-record';
-//         } else if (categoryFilter === 'Bệnh mãn tính') {
-//           endpoint = '/chronic-record';
-//         } else if (categoryFilter === 'Tất cả') {
-//           endpoint = '/disease-record';
-//         }
-
-//         const response = await axiosClient.get(`${endpoint}`);
-//         if (response.data.error === false || (response.data.error === undefined && response.data.data)) {
-//           setRecords(response.data.data || []);
-//         } else {
-//           setError('Không thể tải hồ sơ bệnh: ' + (response.data.message || 'Không có thông báo'));
-//         }
-//       } catch (err) {
-//         setError('Lỗi server khi tải hồ sơ bệnh: ' + err.message);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-//     fetchRecords();
-//   }, [categoryFilter]);
-
-//   const clearFilter = () => {
-//     setSearchTerm('');
-//     setCategoryFilter(null);
-//   };
-
-//   const filteredRecords = records.filter(record =>
-//     (searchTerm === '' || record.student_id.toString().includes(searchTerm) ||
-//      record.disease_name.toLowerCase().includes(searchTerm.toLowerCase()))
-//   );
-
-//   return (
-//     <div className="p-4 bg-gray-100 min-h-screen">
-//       <h1 className="text-2xl font-bold mb-4 text-blue-800">Quản lý bệnh</h1>
-//       <p className="text-gray-600 mb-4">Quản lý và theo dõi sức khỏe học sinh một cách hiệu quả</p>
-
-//       {/* Header Controls */}
-//       {!showAddForm && (<div className="bg-white p-4 rounded-lg shadow-md mb-4 flex flex-col sm:flex-row justify-between items-center">
-//         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-//           <input
-//             type="text"
-//             placeholder="Tìm theo mã HS, chẩn đoán, điều trị..."
-//             value={searchTerm}
-//             onChange={(e) => setSearchTerm(e.target.value)}
-//             className="border rounded p-2 w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//           />
-//           <div className="flex gap-2">
-//             <button
-//               onClick={() => setCategoryFilter('Tất cả')}
-//               className={`px-4 py-2 rounded ${categoryFilter === 'Tất cả' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-600 hover:text-white`}
-//             >
-//               Tất cả
-//             </button>
-//             <button
-//               onClick={() => setCategoryFilter('Bệnh truyền nhiễm')}
-//               className={`px-4 py-2 rounded ${categoryFilter === 'Bệnh truyền nhiễm' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-600 hover:text-white`}
-//             >
-//               Bệnh Truyền Nhiễm
-//             </button>
-//             <button
-//               onClick={() => setCategoryFilter('Bệnh mãn tính')}
-//               className={`px-4 py-2 rounded ${categoryFilter === 'Bệnh mãn tính' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-600 hover:text-white`}
-//             >
-//               Bệnh Mãn Tính
-//             </button>
-//             <button
-//               onClick={clearFilter}
-//               className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
-//             >
-//               Xóa bộ lọc
-//             </button>
-//           </div>
-//         </div>
-//         <div className="flex gap-2 mt-4 sm:mt-0">
-//           <span className="text-gray-600">Tổng hồ sơ: {records.length}</span>
-//           <button
-//             onClick={() => setShowAddForm(true)}
-//             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-//           >
-//             + Thêm Hồ Sơ
-//           </button>
-//         </div>
-//       </div>)}
-
-//       {/* Content Area */}
-//       {error && <div className="text-red-500 mb-4">{error}</div>}
-//       {loading ? (
-//         <div className="text-center text-gray-600">Đang tải...</div>
-//       ) : showAddForm ? (
-//         <AddDiseaseRecord onClose={() => setShowAddForm(false)} categoryFilter={categoryFilter} />
-//       ) : (
-//         <DiseaseRecordIdList records={filteredRecords} />
-//       )}
-//     </div>
-//   );
-// };
-
-// export default DiseaseRecordManagement;
-
-
-
-
-
-
-
+// DiseaseRecordManagement.js
 import React, { useState, useEffect } from 'react';
 import axiosClient from '../../config/axiosClient';
 import DiseaseRecordIdList from './DiseaseRecordIdList';
@@ -136,7 +6,7 @@ import AddDiseaseRecord from './AddDiseaseRecord';
 
 const DiseaseRecordManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('Tất cả');
+  const [categoryFilter, setCategoryFilter] = useState('Bệnh truyền nhiễm');
   const [showAddForm, setShowAddForm] = useState(false);
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -151,16 +21,7 @@ const DiseaseRecordManagement = () => {
           setLoading(false);
           return;
         }
-        
-        let endpoint = '';
-        if (categoryFilter === 'Bệnh truyền nhiễm') {
-          endpoint = '/infectious-record';
-        } else if (categoryFilter === 'Bệnh mãn tính') {
-          endpoint = '/chronic-record';
-        } else if (categoryFilter === 'Tất cả') {
-          endpoint = '/disease-record';
-        }
-
+        const endpoint = categoryFilter === 'Bệnh truyền nhiễm' ? '/infectious-record' : '/chronic-record';
         const response = await axiosClient.get(`${endpoint}`);
         if (response.data.error === false || (response.data.error === undefined && response.data.data)) {
           setRecords(response.data.data || []);
@@ -175,159 +36,119 @@ const DiseaseRecordManagement = () => {
     };
     fetchRecords();
   }, [categoryFilter]);
-
-  const clearFilter = () => {
-    setSearchTerm('');
-    setCategoryFilter('Tất cả');
-  };
-
   const filteredRecords = records.filter(record =>
     (searchTerm === '' || record.student_id.toString().includes(searchTerm) ||
      record.disease_name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const categoryOptions = [
-    { value: 'Tất cả', label: 'Tất cả', icon: '📋', color: 'bg-indigo-500 hover:bg-indigo-600' },
-    { value: 'Bệnh truyền nhiễm', label: 'Bệnh Truyền Nhiễm', icon: '🦠', color: 'bg-red-500 hover:bg-red-600' },
-    { value: 'Bệnh mãn tính', label: 'Bệnh Mãn Tính', icon: '💊', color: 'bg-orange-500 hover:bg-orange-600' }
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header Section */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="bg-white border-b border-slate-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  🏥
-                </div>
-                Quản lý hồ sơ bệnh
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+                Hệ Thống Quản Lý Hồ Sơ Bệnh Án
               </h1>
-              <p className="mt-2 text-gray-600 text-lg">
-                Quản lý và theo dõi sức khỏe học sinh một cách hiệu quả
+              <p className="text-slate-600 mt-2 font-medium">
+                Theo dõi và quản lý tình trạng sức khỏe học sinh một cách chuyên nghiệp
               </p>
             </div>
-            {!showAddForm && (
-              <div className="flex items-center gap-4">
-                <div className="bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
-                  <span className="text-blue-700 font-semibold">
-                    Tổng hồ sơ: {records.length}
-                  </span>
-                </div>
-                <button
-                  onClick={() => setShowAddForm(true)}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 flex items-center gap-2"
-                >
-                  <span className="text-lg">+</span>
-                  Thêm Hồ Sơ
-                </button>
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <div className="text-sm font-medium text-slate-500">Tổng số hồ sơ</div>
+                <div className="text-2xl font-bold text-slate-900">{records.length}</div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"> Tao là Hiếu, tao sửa chỗ này nè mấy tml FE*/}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search and Filter Controls */}
+      <div className="max-w-7xl mx-auto px-6 py-6">
+        {/* Control Panel */}
         {!showAddForm && (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 mb-8">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 mb-6">
             <div className="p-6">
-              {/* Search Bar */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Tìm kiếm hồ sơ
-                </label>
-                <div className="relative">
-                  {/* <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-gray-400 text-lg">🔍</span>
-                  </div> */}
-                  <input
-                    type="text"
-                    placeholder="Tìm theo mã học sinh, tên bệnh, chẩn đoán..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
-                  />
-                </div>
-              </div>
-
-              {/* Category Filter */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Phân loại bệnh
-                </label>
-                <div className="flex flex-wrap gap-3">
-                  {categoryOptions.map((option) => (
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                {/* Search and Filters */}
+                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Tìm kiếm theo mã học sinh hoặc tên bệnh..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full sm:w-80 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors font-medium text-slate-700 placeholder-slate-400"
+                    />
+                    <svg className="absolute right-3 top-3.5 h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  
+                  <div className="flex space-x-2">
                     <button
-                      key={option.value}
-                      onClick={() => setCategoryFilter(option.value)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 ${
-                        categoryFilter === option.value
-                          ? `${option.color} text-white shadow-lg`
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      onClick={() => setCategoryFilter('Bệnh truyền nhiễm')}
+                      className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                        categoryFilter === 'Bệnh truyền nhiễm' 
+                          ? 'bg-red-600 text-white shadow-md' 
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
-                      {/* <span className="text-lg">{option.icon}</span> */}
-                      {option.label}
+                      Bệnh Truyền Nhiễm
                     </button>
-                  ))}
-                  <button
-                    onClick={clearFilter}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all duration-200"
-                  >
-                    {/* <span className="text-lg">🗑️</span> */}
-                    Xóa bộ lọc
-                  </button>
+                    <button
+                      onClick={() => setCategoryFilter('Bệnh mãn tính')}
+                      className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                        categoryFilter === 'Bệnh mãn tính' 
+                          ? 'bg-amber-600 text-white shadow-md' 
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      Bệnh Mãn Tính
+                    </button>
+                  </div>
                 </div>
+
+                {/* Action Button */}
+                <button
+                  onClick={() => setShowAddForm(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm flex items-center space-x-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span>Thêm Hồ Sơ Mới</span>
+                </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-red-800 font-medium">{error}</span>
             </div>
           </div>
         )}
 
         {/* Content Area */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <div className="flex items-center gap-2">
-              <span className="text-red-500 text-lg">⚠️</span>
-              <span className="text-red-700 font-medium">{error}</span>
-            </div>
-          </div>
-        )}
-
         {loading ? (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12">
-            <div className="flex flex-col items-center justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-              <p className="text-gray-600 text-lg font-medium">Đang tải dữ liệu...</p>
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-12">
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="text-slate-600 font-medium">Đang tải dữ liệu...</span>
             </div>
           </div>
         ) : showAddForm ? (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200">
-            <AddDiseaseRecord 
-              onClose={() => setShowAddForm(false)} 
-              categoryFilter={categoryFilter} 
-            />
-          </div>
+          <AddDiseaseRecord onClose={() => setShowAddForm(false)} categoryFilter={categoryFilter} />
         ) : (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200">
-            {filteredRecords.length > 0 ? (
-              <DiseaseRecordIdList records={filteredRecords} />
-            ) : (
-              <div className="p-12 text-center">
-                <div className="text-6xl mb-4">📋</div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                  Không tìm thấy hồ sơ nào
-                </h3>
-                <p className="text-gray-500">
-                  Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm để xem kết quả khác
-                </p>
-              </div>
-            )}
-          </div>
+          <DiseaseRecordIdList records={filteredRecords} />
         )}
       </div>
     </div>

@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useRef } from "react";
 import { useEffect } from "react";
 
-const Header = () => {
+const Header = ({menuItems}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -15,15 +15,6 @@ const Header = () => {
 
   const user = getUser();
   const isLoggedIn = !!user;
-
-  const menuItems = [
-    { title: "Trang chủ", path: "/" },
-    { title: "Hồ sơ sức khỏe", path: "/health-record" },
-    { title: "Quản lý thuốc", path: "/medicine" },
-    { title: "Tiêm chủng", path: "/vaccination" },
-    { title: "Kiểm tra y tế", path: "/health-check" },
-    { title: "Báo cáo", path: "/reports" },
-  ];
 
   const userMenuItems = [
     { title: "Tiện ích", path: "/" + getUserRole(), icon: User },
@@ -103,7 +94,7 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
-            {menuItems.map((item) => (
+            {menuItems && menuItems.map((item) => (
               <button
                 key={item.title}
                 onClick={() => handleNavigation(item.path)}

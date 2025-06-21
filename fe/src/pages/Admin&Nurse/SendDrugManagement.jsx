@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import useSendDrugManagement from "./SendDrugManagementLogic";
+import useSendDrugManagement from "../../hooks/SendDrugManagementLogic";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
@@ -42,6 +42,10 @@ const SendDrugManagement = () => {
     }
   };
 
+  useEffect(() => {
+    console.log("THUOC: ", filteredDrugs);
+  }, [filteredDrugs])
+
   return (
     <div className="min-h-screen w-full bg-gray-50 p-6">
       <div className="mx-auto max-w-7xl">
@@ -73,7 +77,6 @@ const SendDrugManagement = () => {
                 <option>RECEIVED</option>
               </select>
             </div>
-            
           </div>
         </div>
 
@@ -125,7 +128,8 @@ const SendDrugManagement = () => {
                         {drug.student?.name || "Không xác định"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {classMap[drug.student?.class_id]?.class_name || "Chưa có thông tin"}
+                        {classMap[drug.student?.class_id]?.class_name ||
+                          "Chưa có thông tin"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 max-w-[150px] truncate">
                         {drug?.request_items?.[0]?.name || "Không có dữ liệu"}
@@ -160,7 +164,10 @@ const SendDrugManagement = () => {
                         )}
                         {drug.status === "DONE" && (
                           <div className="flex justify-center">
-                            <CheckIcon className="w-5 h-5 text-green-600" title="Đã hoàn thành" />
+                            <CheckIcon
+                              className="w-5 h-5 text-green-600"
+                              title="Đã hoàn thành"
+                            />
                           </div>
                         )}
                       </td>
@@ -169,7 +176,11 @@ const SendDrugManagement = () => {
                           <button
                             className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50"
                             onClick={() => handleView(drug)}
-                            title={expandedRows.includes(drug.id) ? "Ẩn chi tiết" : "Xem chi tiết"}
+                            title={
+                              expandedRows.includes(drug.id)
+                                ? "Ẩn chi tiết"
+                                : "Xem chi tiết"
+                            }
                           >
                             {expandedRows.includes(drug.id) ? (
                               <EyeOff className="w-5 h-5" />
@@ -243,31 +254,49 @@ const SendDrugManagement = () => {
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-4">
                                   <p className="text-sm">
-                                    <span className="font-semibold text-gray-700">Tên học sinh:</span>{" "}
-                                    <span className="text-gray-900">{drug.student?.name || "Không xác định"}</span>
-                                  </p>
-                                  <p className="text-sm">
-                                    <span className="font-semibold text-gray-700">Lớp:</span>{" "}
+                                    <span className="font-semibold text-gray-700">
+                                      Tên học sinh:
+                                    </span>{" "}
                                     <span className="text-gray-900">
-                                      {classMap[drug.student?.class_id]?.class_name || "Chưa có thông tin"}
+                                      {drug.student?.name || "Không xác định"}
                                     </span>
                                   </p>
                                   <p className="text-sm">
-                                    <span className="font-semibold text-gray-700">Mô tả bệnh:</span>{" "}
-                                    <span className="text-gray-900">{drug?.diagnosis || "Không có mô tả"}</span>
+                                    <span className="font-semibold text-gray-700">
+                                      Lớp:
+                                    </span>{" "}
+                                    <span className="text-gray-900">
+                                      {classMap[drug.student?.class_id]
+                                        ?.class_name || "Chưa có thông tin"}
+                                    </span>
                                   </p>
                                   <p className="text-sm">
-                                    <span className="font-semibold text-gray-700">Trạng thái:</span>{" "}
+                                    <span className="font-semibold text-gray-700">
+                                      Mô tả bệnh:
+                                    </span>{" "}
+                                    <span className="text-gray-900">
+                                      {drug?.diagnosis || "Không có mô tả"}
+                                    </span>
+                                  </p>
+                                  <p className="text-sm">
+                                    <span className="font-semibold text-gray-700">
+                                      Trạng thái:
+                                    </span>{" "}
                                     <span
                                       className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                                         {
-                                          PROCESSING: "bg-yellow-100 text-yellow-800",
-                                          ACCEPTED: "bg-green-100 text-green-800",
+                                          PROCESSING:
+                                            "bg-yellow-100 text-yellow-800",
+                                          ACCEPTED:
+                                            "bg-green-100 text-green-800",
                                           REFUSED: "bg-red-100 text-red-800",
                                           DONE: "bg-blue-100 text-blue-800",
-                                          CANCELLED: "bg-gray-100 text-gray-800",
-                                          RECEIVED: "bg-purple-100 text-purple-800",
-                                        }[drug.status] || "bg-gray-100 text-gray-800"
+                                          CANCELLED:
+                                            "bg-gray-100 text-gray-800",
+                                          RECEIVED:
+                                            "bg-purple-100 text-purple-800",
+                                        }[drug.status] ||
+                                        "bg-gray-100 text-gray-800"
                                       }`}
                                     >
                                       {drug.status || "Chưa xác định"}
@@ -276,19 +305,29 @@ const SendDrugManagement = () => {
                                 </div>
                                 <div className="space-y-4">
                                   <p className="text-sm">
-                                    <span className="font-semibold text-gray-700">Danh sách thuốc:</span>
+                                    <span className="font-semibold text-gray-700">
+                                      Danh sách thuốc:
+                                    </span>
                                   </p>
                                   {drug?.request_items?.length > 0 ? (
                                     <ul className="list-disc pl-5 text-sm text-gray-900 space-y-2">
                                       {drug.request_items.map((item, index) => (
-                                        <li key={index} className="flex items-center gap-2">
+                                        <li
+                                          key={index}
+                                          className="flex items-center gap-2"
+                                        >
                                           <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                                          {item.name} - <span className="font-medium">Số lượng: {item.quantity}</span>
+                                          {item.name} -{" "}
+                                          <span className="font-medium">
+                                            Số lượng: {item.quantity}
+                                          </span>
                                         </li>
                                       ))}
                                     </ul>
                                   ) : (
-                                    <p className="text-sm text-gray-500">Không có thuốc trong đơn.</p>
+                                    <p className="text-sm text-gray-500">
+                                      Không có thuốc trong đơn.
+                                    </p>
                                   )}
                                 </div>
                               </div>
@@ -303,7 +342,7 @@ const SendDrugManagement = () => {
             </table>
           ) : (
             <div className="text-center py-12 text-gray-500">
-              {drugs.length === 0 
+              {drugs.length === 0
                 ? "Không có dữ liệu đơn thuốc."
                 : "Không tìm thấy đơn thuốc phù hợp."}
             </div>

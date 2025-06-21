@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import axiosClient from "../../config/axiosClient";
-import { getUser } from "../../service/authService";
-import { getChildClass } from "../../service/childenService";
+import axiosClient from "../config/axiosClient";
+import { getUser } from "../service/authService";
+import { getChildClass } from "../service/childenService";
 import {
   handleAccept,
   handleRefuse,
   handleCancel,
   handleReceive,
   handleDone,
-} from "../../utils/statusUpdateHandler";
+} from "../utils/statusUpdateHandler";
 import { useSnackbar } from "notistack";
 
 const useSendDrugManagement = () => {

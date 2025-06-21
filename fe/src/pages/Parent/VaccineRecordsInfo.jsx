@@ -2,17 +2,13 @@ import { useEffect, useState } from "react";
 import { Syringe, Loader2, AlertCircle } from "lucide-react";
 import axiosClient from "../../config/axiosClient";
 
-const VaccineRecordsInfo = () => {
+const VaccineRecordsInfo = ({currChild}) => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currChild, setCurrChild] = useState(null);
 
   useEffect(() => {
-    const child = JSON.parse(localStorage.getItem('selectedChild'));
-    if (child) setCurrChild(child);
-
-    if (!child?.id) {
+    if (!currChild?.id) {
       setError("Không tìm thấy thông tin học sinh");
       setLoading(false);
       return;
@@ -21,7 +17,7 @@ const VaccineRecordsInfo = () => {
     const fetchRecords = async () => {
       try {
         setLoading(true);
-        const res = await axiosClient.get(`/student/${child.id}/vaccination-record`);
+        const res = await axiosClient.get(`/student/${currChild.id}/vaccination-record`);
         const recordData = res.data.data || [];
         setRecords(recordData);
         setError(null);
@@ -33,7 +29,7 @@ const VaccineRecordsInfo = () => {
       }
     };
     fetchRecords();
-  }, []);
+  }, [currChild.id]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "Chưa xác định";
@@ -112,15 +108,15 @@ const VaccineRecordsInfo = () => {
         <div className="overflow-x-auto">
           <table className="w-full bg-white border border-gray-200 rounded-lg shadow-md">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-3 py-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STT</th>
-                <th className="px-3 py-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã học sinh</th>
-                <th className="px-3 py-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã vaccine</th>
-                <th className="px-3 py-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên vaccine</th>
-                <th className="px-3 py-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mô tả</th>
-                <th className="px-3 py-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày tiêm</th>
-                <th className="px-3 py-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Địa điểm</th>
-                <th className="px-3 py-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+              <tr className="bg-gray-50 border-b border-gray-200 text-center">
+                <th className="px-3 py-6 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">STT</th>
+                <th className="px-3 py-6 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Mã học sinh</th>
+                <th className="px-3 py-6 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Mã vaccine</th>
+                <th className="px-3 py-6 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Tên vaccine</th>
+                <th className="px-3 py-6 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Mô tả</th>
+                <th className="px-3 py-6 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày tiêm</th>
+                <th className="px-3 py-6 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Địa điểm</th>
+                <th className="px-3 py-6 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">

@@ -15,6 +15,12 @@ const ParentDashboard = () => {
 
   const services = [
     {
+      icon: <Calendar className="w-8 h-8 text-orange-600" />,
+      title: "Hồ sơ sức khỏe",
+      description: "Xem và cập nhật hồ sơ sức khỏe của trẻ",
+      path: selectedChild ? `/parent/edit/${selectedChild.id}/health-profile` : "#",
+    },    
+    {
       icon: <Syringe className="w-8 h-8 text-green-600" />,
       title: "Tiêm Chủng",
       description: "Theo dõi và cập nhật lịch tiêm chủng",
@@ -36,21 +42,14 @@ const ParentDashboard = () => {
       icon: <Pill className="w-8 h-8 text-purple-600" />,
       title: "Gửi thuốc cho nhà trường",
       description: "Đăng ký và theo dõi thuốc tại trường",
-      info: "1 đơn thuốc đang chờ xác nhận",
       path: selectedChild ? `/parent/edit/${selectedChild.id}/drug-table` : "#",
     },
     {
-      icon: <Calendar className="w-8 h-8 text-orange-600" />,
-      title: "Tổng quan sức khỏe",
-      description: "Xem tổng quan sức khỏe và lịch sử",
-      path: selectedChild ? `/parent/edit/${selectedChild.id}/health-record` : "#",
+      icon: <BarChart3 className="w-8 h-8 text-cyan-600" />,
+      title: "Báo cáo sức khỏe",
+      description: "Xem báo cáo tổng quan sức khỏe",
+      path: selectedChild ? `/parent/edit/${selectedChild.id}/health-check` : "#",
     },
-    // {
-    //   icon: <BarChart3 className="w-8 h-8 text-cyan-600" />,
-    //   title: "Báo cáo sức khỏe",
-    //   description: "Xem báo cáo tổng quan sức khỏe",
-    //   path: selectedChild ? `/parent/edit/${selectedChild.id}/health-check` : "#",
-    // },
   ];
 
   useEffect(() => {

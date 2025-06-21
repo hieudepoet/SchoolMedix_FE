@@ -4,6 +4,7 @@ import { getUserRole } from '../../service/authService';
 import axiosClient from '../../config/axiosClient';
 import { useNavigate } from 'react-router-dom';
 import { enqueueSnackbar } from 'notistack';
+import { getStatusColor, calculateDuration, formatDate, getCardBorderColor, getStatusText } from '../../utils/campaignUtils';
 
 const VaccineCampaignManagement = () => {
   const [campaignList, setCampaignList] = useState([]);
@@ -62,39 +63,6 @@ const VaccineCampaignManagement = () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'COMPLETED': return 'text-emerald-800 bg-emerald-50 border-emerald-200';
-      case 'ONGOING': return 'text-indigo-800 bg-indigo-50 border-indigo-200';
-      case 'PREPARING': return 'text-amber-800 bg-amber-50 border-amber-200';
-      case 'CANCELLED': return 'text-red-800 bg-red-50 border-red-200';
-      case 'UPCOMING': return 'text-violet-800 bg-violet-50 border-violet-200';
-      default: return 'text-slate-800 bg-slate-50 border-slate-200';
-    }
-  };
-
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'COMPLETED': return 'Đã hoàn thành';
-      case 'ONGOING': return 'Đang thực hiện';
-      case 'PREPARING': return 'Đang chuẩn bị';
-      case 'CANCELLED': return 'Đã hủy bỏ';
-      case 'UPCOMING': return 'Sắp triển khai';
-      default: return 'Không xác định';
-    }
-  };
-
   const getStatusIcon = (status) => {
     switch (status) {
       case 'COMPLETED': return <CheckCircle className="w-4 h-4" />;
@@ -106,16 +74,6 @@ const VaccineCampaignManagement = () => {
     }
   };
 
-  const getCardBorderColor = (status) => {
-    switch (status) {
-      case 'COMPLETED': return 'border-l-emerald-600';
-      case 'ONGOING': return 'border-l-indigo-600';
-      case 'PREPARING': return 'border-l-amber-600';
-      case 'CANCELLED': return 'border-l-red-600';
-      case 'UPCOMING': return 'border-l-violet-600';
-      default: return 'border-l-slate-600';
-    }
-  };
 
   const getPrimaryActionConfig = (status, campaignId) => {
     if (userRole === 'nurse') {
