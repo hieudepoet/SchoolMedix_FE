@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axiosClient from '../../config/axiosClient';
-import { getCardBorderColor, calculateDuration, formatDate, getStatusColor } from '../../utils/campaignUtils.js';
+import { getCardBorderColor, calculateDuration, formatDate, getStatusColor, getStatusText } from '../../utils/campaignUtils.js';
 
 const VaccineCampaignDetails = () => {
   // Mock path and navigation for demo

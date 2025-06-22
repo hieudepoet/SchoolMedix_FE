@@ -4,7 +4,7 @@ import { getUserRole } from '../../service/authService';
 import axiosClient from '../../config/axiosClient';
 import { useNavigate } from 'react-router-dom';
 import { enqueueSnackbar } from 'notistack';
-import { getStatusColor, calculateDuration, formatDate, getCardBorderColor, getStatusText } from '../../utils/campaignUtils';
+import { getStatusColor, formatDate, getCardBorderColor, getStatusText } from '../../utils/campaignUtils';
 
 const VaccineCampaignManagement = () => {
   const [campaignList, setCampaignList] = useState([]);

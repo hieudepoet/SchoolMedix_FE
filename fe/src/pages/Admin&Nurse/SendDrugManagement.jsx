@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import useSendDrugManagement from "../../hooks/SendDrugManagementLogic";
+import useSendDrugManagement from "../../hooks/useSendDrugManagement";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
