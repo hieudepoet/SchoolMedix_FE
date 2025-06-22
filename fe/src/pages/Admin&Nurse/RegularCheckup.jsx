@@ -11,6 +11,7 @@ import {
   XCircle,
   FileText,
   Activity,
+  Users
 } from "lucide-react";
 import axiosClient from "../../config/axiosClient";
 import { getUserRole } from "../../service/authService";
@@ -208,7 +209,7 @@ const RegularCheckup = () => {
               </h1>
               <p className="text-slate-600 text-base">
                 {userRole === "admin"
-                  ? "Hệ thống quản lý và giám polg sát các chiến dịch khám sức khỏe"
+                  ? "Hệ thống quản lý và giám sát các chiến dịch khám sức khỏe"
                   : "Theo dõi và cập nhật báo cáo chiến dịch khám sức khỏe"}
               </p>
             </div>
