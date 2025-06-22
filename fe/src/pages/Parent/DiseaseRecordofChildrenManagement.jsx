@@ -92,7 +92,7 @@ const DiseaseRecordOfChildrenManagement = () => {
                   className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 flex items-center gap-2"
                 >
                   <span className="text-lg">+</span>
-                  Thêm Hồ Sơ
+                  Khai báo Bệnh
                 </button>
               </div>
             )}
