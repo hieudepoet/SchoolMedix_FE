@@ -56,6 +56,8 @@ export const getStatusText = (status) => {
   switch (status) {
     case "COMPLETED":
       return "Đã hoàn thành";
+    case "DONE":
+      return "Đã hoàn thành";
     case "ONGOING":
       return "Đang diễn ra";
     case "PREPARING":
@@ -68,4 +70,3 @@ export const getStatusText = (status) => {
       return "Không xác định";
   }
 };
-

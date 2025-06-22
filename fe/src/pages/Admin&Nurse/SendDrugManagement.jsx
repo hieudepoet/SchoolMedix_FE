@@ -125,11 +125,12 @@ const SendDrugManagement = () => {
                         {drug.id}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {drug.student?.name || "Không xác định"}
+                        {drug.student_name || "Không xác định"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {classMap[drug.student?.class_id]?.class_name ||
-                          "Chưa có thông tin"}
+                        {
+                          drug.class_name
+                        }
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 max-w-[150px] truncate">
                         {drug?.request_items?.[0]?.name || "Không có dữ liệu"}
@@ -258,7 +259,7 @@ const SendDrugManagement = () => {
                                       Tên học sinh:
                                     </span>{" "}
                                     <span className="text-gray-900">
-                                      {drug.student?.name || "Không xác định"}
+                                      {drug?.student_name || "Không xác định"}
                                     </span>
                                   </p>
                                   <p className="text-sm">
@@ -266,8 +267,7 @@ const SendDrugManagement = () => {
                                       Lớp:
                                     </span>{" "}
                                     <span className="text-gray-900">
-                                      {classMap[drug.student?.class_id]
-                                        ?.class_name || "Chưa có thông tin"}
+                                      {drug?.class_name}
                                     </span>
                                   </p>
                                   <p className="text-sm">

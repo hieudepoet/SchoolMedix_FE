@@ -41,8 +41,8 @@ const StudentRegularCheckup = () => {
     fetchData();
   }, []);
 
-  const handleViewDetails = (campaignId) => {
-    navigate(`/student/checkup/${currChild.id}/details/${campaignId}`);
+  const handleSurvey = (campaignId) => {
+    navigate(`/parent/edit/${currChild.id}/surveyCheckup/${campaignId}`);
   };
 
   const formatDate = (dateString) => {
@@ -180,7 +180,7 @@ const StudentRegularCheckup = () => {
                     <div
                       key={campaign.id}
                       className="bg-white border border-gray-300 rounded-xl p-8 hover:border-gray-400 hover:shadow-lg transition-all duration-200"
-                      onClick={() => handleViewDetails(campaign.id)}
+                      onClick={() => handleSurvey(campaign.id)}
                     >
                       <div className="flex items-start justify-between mb-6">
                         <div className="flex-1">
@@ -228,7 +228,7 @@ const StudentRegularCheckup = () => {
 
                       <div className="flex justify-end pt-4 border-t border-gray-200">
                         <button
-                          onClick={() => statusInfo.canSurvey && handleViewDetails(campaign.id)}
+                          onClick={() => statusInfo.canSurvey && handleSurvey(campaign.id)}
                           disabled={!statusInfo.canSurvey}
                           className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium shadow-sm transition-colors ${
                             !statusInfo.canSurvey

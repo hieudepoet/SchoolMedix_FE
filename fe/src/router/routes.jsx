@@ -26,8 +26,11 @@ import VaccineReport from "../pages/Admin&Nurse/VaccineReport";
 import RegularCheckup from "../pages/Admin&Nurse/RegularCheckup";
 import StudentRegularCheckup from "../pages/Parent/StudentRegularCheckup";
 import DiseaseRecordManagement from "../pages/Admin&Nurse/DiseaseRecordManagement";
-import VaccineRecordsInfo from "../pages/Parent/VaccineRecordsInfo";
 import DiseaseRecordOfChildrenManagement from "../pages/Parent/DiseaseRecordofChildrenManagement";
+import RegularCheckupDetails from "../pages/Admin&Nurse/RegularCheckupDetails";
+import AddRegularCheckupCampaign from "../pages/Admin&Nurse/AddRegularCheckupCampaign";
+import RegularCheckupRegisterList from "../pages/Admin&Nurse/RegularCheckupRegisterList";
+import RegularCheckupSurvey from "../pages/Parent/RegularCheckupSurvey";
 
 const routes = createBrowserRouter([
   {
@@ -100,6 +103,18 @@ const routes = createBrowserRouter([
           {
             path: "disease-record",
             element: <DiseaseRecordManagement/>
+          },
+          {
+            path: "checkup-campaign/:checkup_id",
+            element: <RegularCheckupDetails/>
+          },
+          {
+            path: "checkup-campaign-creation",
+            element: <AddRegularCheckupCampaign/>
+          },
+          {
+            path: "checkup-campaign/:checkup-id/register-list",
+            element: <RegularCheckupRegisterList/>
           }
         ],
       },
@@ -211,10 +226,14 @@ const routes = createBrowserRouter([
           {
             path: "disease-record",
             element: <DiseaseRecordOfChildrenManagement/>
-          }
-        ]
-      }
-    ]
+          },
+          {
+            path: "surveyCheckup/:checkup_id",
+            element: <RegularCheckupSurvey/>
+          },
+        ],
+      },
+    ],
   },
   {
     path: "/nurse",

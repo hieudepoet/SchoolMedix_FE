@@ -11,7 +11,7 @@ import {
   XCircle,
   FileText,
   Activity,
-  Users
+  Users,
 } from "lucide-react";
 import axiosClient from "../../config/axiosClient";
 import { getUserRole } from "../../service/authService";
@@ -78,17 +78,17 @@ const RegularCheckup = () => {
     setLoadingActions((prev) => ({ ...prev, [campaignId]: true }));
     try {
       const response = await axiosClient.patch(
-        `/checkup-campaign/${campaignId}/${action}`
+        `/checkup-register/${campaignId}/${action}`
       );
       const res = await axiosClient.get("/checkup-campaign");
       setCampaignList(res.data.data || []);
-      enqueueSnackbar(response?.data.message, { variant: "info" });
+      enqueueSnackbar("Something went wrong!", { variant: "info" });
     } catch (error) {
       console.error(
         `Error performing ${action} on campaign ${campaignId}:`,
         error.response.data.message
       );
-      enqueueSnackbar(error.response.data.message, { variant: "error" });
+      enqueueSnackbar("Something went wrong!", { variant: "error" });
     } finally {
       setLoadingActions((prev) => ({ ...prev, [campaignId]: false }));
     }
@@ -129,7 +129,7 @@ const RegularCheckup = () => {
       case "PREPARING":
         return {
           text: "Đóng đơn đăng ký",
-          action: "close-register",
+          action: "close",
           className: "bg-amber-700 hover:bg-amber-800 text-white",
           disabled: false,
         };
@@ -250,7 +250,7 @@ const RegularCheckup = () => {
         </div>
 
         <div className="space-y-4">
-          {campaignList.map((campaign) => {
+          {campaignList.map((campaign, index) => {
             const primaryAction = getPrimaryActionConfig(campaign.status, campaign.id);
             const isLoading = loadingActions[campaign.id];
 
@@ -331,36 +331,10 @@ const RegularCheckup = () => {
                       </div>
                     </div>
 
-                    {campaign.specialist_exams && campaign.specialist_exams.length > 0 && (
-                      <div className="mt-6">
-                        <h4 className="text-lg font-semibold text-slate-900 mb-4">
-                          Các hạng mục khám chuyên khoa
-                        </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {campaign.specialist_exams.map((exam) => (
-                            <div
-                              key={exam.id}
-                              className="bg-white rounded-lg p-4 border border-slate-200 shadow-sm hover:border-indigo-300 transition-colors"
-                            >
-                              <div className="flex items-start space-x-3">
-                                <div className="p-2 bg-indigo-100 rounded-lg">
-                                  <Users className="w-4 h-4 text-indigo-600" />
-                                </div>
-                                <div>
-                                  <h5 className="font-semibold text-slate-900 mb-2">{exam.name}</h5>
-                                  <p className="text-sm text-slate-600">{exam.description}</p>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
                     <div className="mt-6 pt-6 border-t border-slate-200 flex flex-wrap gap-3">
                       <button
                         className="px-5 py-2.5 bg-slate-600 hover:bg-slate-700 text-white font-medium rounded-lg transition-colors duration-200"
-                        onClick={() => navigate(`/${getUserRole()}/checkup-campaign/${campaign.id}`)}
+                        onClick={() => navigate(`/${getUserRole()}/checkup-campaign/${index}`)}
                       >
                         <FileText className="w-4 h-4 inline mr-2" />
                         Xem chi tiết

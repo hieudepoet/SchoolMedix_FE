@@ -15,13 +15,13 @@ const DiseaseRecordList = ({ records }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-      <div className="bg-slate-50 px-6 py-4 grid grid-cols-12 gap-4 text-xs font-medium text-slate-500 uppercase">
+      <div className="bg-slate-50 px-6 py-4 grid grid-cols-13 gap-4 text-xs font-medium text-slate-500 uppercase">
         <div className="col-span-2">Mã học sinh</div>
         <div className="col-span-2">Ngày phát hiện</div>
         <div className="col-span-2">Ngày ghi nhận</div>
         <div className="col-span-3">Chẩn đoán</div>
         <div className="col-span-2">Phân loại</div>
-        <div className="col-span-1 text-center">Thao tác</div>
+        <div className="col-span-2 text-center">Thao tác</div>
       </div>
 
       <div className="divide-y divide-slate-200">
@@ -36,7 +36,7 @@ const DiseaseRecordList = ({ records }) => {
         ) : (
           records.map((record, index) => (
             <div key={index} className="hover:bg-slate-50 transition-colors">
-              <div className="px-6 py-4 grid grid-cols-12 gap-4 items-center">
+              <div className="px-6 py-4 grid grid-cols-13 gap-4 items-center">
                 <div className="col-span-2 font-semibold text-indigo-600">#{record.student_id}</div>
                 <div className="col-span-2 text-slate-700">{new Date(record.detect_date).toLocaleDateString("vi-VN")}</div>
                 <div className="col-span-2 text-slate-700">{new Date(record.created_at).toLocaleDateString("vi-VN")}</div>
@@ -46,7 +46,7 @@ const DiseaseRecordList = ({ records }) => {
                     {record.disease_category === "Bệnh truyền nhiễm" ? "Truyền nhiễm" : "Mãn tính"}
                   </span>
                 </div>
-                <div className="col-span-1 text-center">
+                <div className="col-span-2 text-center">
                   <button
                     onClick={() => toggleDetails(index)}
                     className="flex items-center gap-1 mx-auto text-indigo-600 hover:text-indigo-800 text-sm font-medium"
