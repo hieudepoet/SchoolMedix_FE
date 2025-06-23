@@ -137,7 +137,7 @@ const RegularCheckupDetails = () => {
                 </div>
                 <button
                   onClick={() => {
-                    navigate('/'+getUserRole()+'/checkup-campaign/'+checkup_id+'/register-list')
+                    navigate('/'+getUserRole()+'/checkup-campaign/'+details?.id+'/register-list')
                   }}
                   className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >

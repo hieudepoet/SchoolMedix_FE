@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import axiosClient from "../../config/axiosClient";
 import { getUser } from "../../service/authService";
-import { getChildClass } from "../../service/childenService";
 import { Link, useNavigate } from "react-router-dom";
 
 const DrugTable = () => {

@@ -214,7 +214,6 @@ const UserManagement = () => {
   const getActiveTab = () => tabs.find(tab => tab.key === activeTab);
 
   const renderUserCard = (user) => {
-    const activeTabData = getActiveTab();
 
     return (
       <div key={user.id} className="group bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-gray-200 transition-all duration-200">
