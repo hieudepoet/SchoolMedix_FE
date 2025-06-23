@@ -11,6 +11,7 @@ const StudentRegularCheckup = () => {
   const [currChild, setCurrChild] = useState(null);
   const navigate = useNavigate();
   const [historyView, setHistoryView] = useState(false);
+  const [isSurveyed, setIsSurveyed] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,9 +63,9 @@ const StudentRegularCheckup = () => {
         return {
           status: "Chuẩn bị",
           className: "bg-orange-100 text-orange-900 border-orange-400",
-          canSurvey: true,
+          canSurvey: (isSurveyed ? false:true),
         };
-      case "ACTIVE":
+      case "ONGOING":
         return {
           status: "Đang diễn ra",
           className: "bg-green-100 text-green-900 border-green-400",
@@ -236,7 +237,7 @@ const StudentRegularCheckup = () => {
                               : "bg-blue-600 text-white hover:bg-blue-700"
                           }`}
                         >
-                          Khảo sát
+                          {isSurveyed? "Đã Khảo Sát":"Khảo Sát"}
                         </button>
                       </div>
                     </div>

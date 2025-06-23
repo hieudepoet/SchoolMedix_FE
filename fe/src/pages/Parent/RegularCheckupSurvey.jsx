@@ -31,7 +31,8 @@ const RegularCheckupSurvey = () => {
         const registerResponse = await axiosClient.get(
           `/checkup/campaign_id/${campaign_id}/student_id/${student_id}`
         );
-        if (registerResponse.data.error) {
+        console.log("register response:", registerResponse)
+        if (registerResponse.data.error === true) {
           setError(registerResponse.data.message || "Không tìm thấy Register ID.");
         } else if (registerResponse.data.data && registerResponse.data.data.id) {
           setRegisterId(registerResponse.data.data.id);
@@ -234,6 +235,7 @@ const RegularCheckupSurvey = () => {
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               placeholder="Nhập lý do..."
               rows="4"
+              required
             />
           </div>
 

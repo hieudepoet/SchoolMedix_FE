@@ -85,7 +85,7 @@ const AddRegularCheckupCampaign = () => {
         });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Có lỗi xảy ra khi tạo chiến dịch. Vui lòng thử lại.' });
+      {error && setMessage({ type: 'error', text: 'Có lỗi xảy ra khi tạo chiến dịch. Vui lòng thử lại.' })};
     } finally {
       setLoading(false);
     }

@@ -31,6 +31,8 @@ import RegularCheckupDetails from "../pages/Admin&Nurse/RegularCheckupDetails";
 import AddRegularCheckupCampaign from "../pages/Admin&Nurse/AddRegularCheckupCampaign";
 import RegularCheckupRegisterList from "../pages/Admin&Nurse/RegularCheckupRegisterList";
 import RegularCheckupSurvey from "../pages/Parent/RegularCheckupSurvey";
+import CheckupCampaignReport from "../pages/Nurse/CheckupCampaignReport";
+import CompletedVaccineReport from "../pages/Admin&Nurse/CompletedVaccineReport";
 
 const routes = createBrowserRouter([
   {
@@ -115,6 +117,10 @@ const routes = createBrowserRouter([
           {
             path: "checkup-campaign/:checkup_id/register-list",
             element: <RegularCheckupRegisterList/>
+          },
+          {
+            path: "vaccine-campaign/:campaign_id",
+            element: <CompletedVaccineReport/>
           }
         ],
       },
@@ -282,6 +288,14 @@ const routes = createBrowserRouter([
           {
             path: "disease",
             element: <DiseaseRecordManagement/>
+          },
+          {
+            path: "regular-report/:checkup_id",
+            element: <CheckupCampaignReport/>
+          },
+          {
+            path: "vaccine-campaign/:campaign_id",
+            element: <CompletedVaccineReport/>
           }
         ],
       },

@@ -119,7 +119,7 @@ const RegularCheckup = () => {
           action: "edit-report",
           className: "bg-indigo-700 hover:bg-indigo-800 text-white",
           disabled: false,
-          onClick: () => navigate("/bao-cao"),
+          onClick: () => navigate("/nurse/regular-report/" + campaignId),
         };
       }
       return null;
