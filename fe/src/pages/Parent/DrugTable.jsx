@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AnimatePresence} from "framer-motion"; // Thêm import motion
+import { AnimatePresence, motion } from "framer-motion"; // Thêm import motion
 import {
   Search,
   Filter,
@@ -25,7 +25,7 @@ const DrugTable = () => {
   const [error, setError] = useState(null);
   const [currChild, setCurrChild] = useState({});
   const [childClass, setChildClass] = useState(null);
-  
+
   // Trạng thái để theo dõi nhiều đơn thuốc đang được mở rộng
   const [expandedRows, setExpandedRows] = useState([]);
 
@@ -50,9 +50,9 @@ const DrugTable = () => {
 
       setIsLoading(true);
       try {
-        const clas = await getChildClass(child?.class_id);
-        console.log("Child class fetched:", clas); // Debug log
-        setChildClass(clas || "Chưa có thông tin");
+        // const clas = await getChildClass(child?.class_id);
+        console.log("Child class fetched:", child.class_name); // Debug log
+        setChildClass(child.class_name || "Chưa có thông tin");
         const res = await axiosClient.get(`/student/${child.id}/send-drug-request`);
         setDrugs(res.data.data || []);
         console.log("DRUGS: ", res.data.data)
@@ -203,10 +203,10 @@ const DrugTable = () => {
                           {drug.id}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {currChild?.profile.name || "Không xác định"}
+                          {currChild?.name || "Không xác định"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {childClass?.class_name || "Chưa có thông tin"}
+                          {currChild?.class_name || "Chưa có thông tin"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 max-w-[150px] truncate">
                           {drug?.request_items?.[0]?.name || "Không có dữ liệu"}
@@ -216,9 +216,8 @@ const DrugTable = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
-                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              statusColors[drug.status] || "bg-gray-100 text-gray-800"
-                            }`}
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColors[drug.status] || "bg-gray-100 text-gray-800"
+                              }`}
                           >
                             {drug.status || "Chưa xác định"}
                           </span>
@@ -273,7 +272,7 @@ const DrugTable = () => {
                                     </p>
                                     <p className="text-sm">
                                       <span className="font-semibold text-gray-700">Lớp:</span>{" "}
-                                      <span className="text-gray-900">{childClass?.class_name || "Chưa có thông tin"}</span>
+                                      <span className="text-gray-900">{currChild?.class_name || "Chưa có thông tin"}</span>
                                     </p>
                                     <p className="text-sm">
                                       <span className="font-semibold text-gray-700">Mô tả bệnh:</span>{" "}
@@ -282,9 +281,8 @@ const DrugTable = () => {
                                     <p className="text-sm">
                                       <span className="font-semibold text-gray-700">Trạng thái:</span>{" "}
                                       <span
-                                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                          statusColors[drug.status] || "bg-gray-100 text-gray-800"
-                                        }`}
+                                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColors[drug.status] || "bg-gray-100 text-gray-800"
+                                          }`}
                                       >
                                         {drug.status || "Chưa xác định"}
                                       </span>
@@ -299,7 +297,7 @@ const DrugTable = () => {
                                         {drug.request_items.map((item, index) => (
                                           <li key={index} className="flex items-center gap-2">
                                             <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                                            {item.name} - <span className="font-medium">Số lượng: {item.quantity}</span>
+                                            {item.name} - <span className="font-medium">Số lượng: {item.dosage_usage}</span>
                                           </li>
                                         ))}
                                       </ul>

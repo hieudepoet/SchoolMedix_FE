@@ -11,5 +11,5 @@ export const getUser = () => {
 }
 
 export const getUserRole = () => {
-    return getUser()?.app_metadata?.role;
+    return getUser()?.role;
 }

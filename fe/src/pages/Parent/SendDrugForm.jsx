@@ -42,7 +42,7 @@ const SendDrugForm = () => {
       setFormData((prev) => ({
         ...prev,
         student_id: child.id || "",
-        create_by: user?.user_metadata.id || "",
+        create_by: user?.id || "",
       }));
     };
     fetchData();
@@ -131,8 +131,8 @@ const SendDrugForm = () => {
       console.error("Error submitting drug request:", error);
       setError(
         error.response?.data?.message ||
-          error.message ||
-          "Không thể gửi đơn thuốc. Vui lòng thử lại sau."
+        error.message ||
+        "Không thể gửi đơn thuốc. Vui lòng thử lại sau."
       );
     } finally {
       setIsLoading(false);
@@ -251,7 +251,7 @@ const SendDrugForm = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -339,7 +339,7 @@ const SendDrugForm = () => {
                         </button>
                       )}
                     </div>
-                    
+
                     <div className="grid grid-cols-1 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -355,7 +355,7 @@ const SendDrugForm = () => {
                           required
                         />
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -371,7 +371,7 @@ const SendDrugForm = () => {
                             required
                           />
                         </div>
-                        
+
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Thời gian uống <span className="text-red-500">*</span>

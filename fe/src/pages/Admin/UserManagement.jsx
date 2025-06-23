@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Search, 
-  Plus, 
-  Edit3, 
-  Trash2, 
-  Eye, 
-  UserCheck, 
-  UserX, 
+import {
+  Search,
+  Plus,
+  Edit3,
+  Trash2,
+  Eye,
+  UserCheck,
+  UserX,
   Filter,
   Download,
   Upload,
@@ -18,11 +18,15 @@ import {
   ChevronDown,
   Settings
 } from 'lucide-react';
+import axiosClient from '../../config/axiosClient';
 
 const UserManagement = () => {
-  const [activeTab, setActiveTab] = useState('nurse');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newUser, setNewUser] = useState({});
+  const [activeTab, setActiveTab] = useState('admin');
   const [searchTerm, setSearchTerm] = useState('');
   const [users, setUsers] = useState({
+    admin: [],
     nurse: [],
     parent: [],
     student: []
@@ -30,162 +34,69 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState(new Set());
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedUserDetail, setSelectedUserDetail] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedImgFile, setSelectedImgFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
-  // Mock data với nhiều thông tin hơn
-  const mockUsers = {
-    nurse: [
-      { 
-        id: 1, 
-        name: 'BS. Nguyễn Thị Lan', 
-        email: 'lan.nurse@hospital.com', 
-        phone: '0901234567', 
-        status: 'active', 
-        department: 'Khoa Nhi', 
-        position: 'Trưởng khoa',
-        experience: '8 năm',
-        avatar: 'https://ui-avatars.com/api/?name=Nguyen+Thi+Lan&background=3b82f6&color=fff',
-        created_at: '2024-01-15',
-        last_login: '2024-06-18 09:30'
-      },
-      { 
-        id: 2, 
-        name: 'Y tá Trần Văn Minh', 
-        email: 'minh.nurse@hospital.com', 
-        phone: '0901234568', 
-        status: 'active', 
-        department: 'Khoa Truyền nhiễm',
-        position: 'Y tá trưởng', 
-        experience: '5 năm',
-        avatar: 'https://ui-avatars.com/api/?name=Tran+Van+Minh&background=10b981&color=fff',
-        created_at: '2024-02-10',
-        last_login: '2024-06-18 08:15'
-      },
-      { 
-        id: 3, 
-        name: 'Y tá Lê Thị Hoa', 
-        email: 'hoa.nurse@hospital.com', 
-        phone: '0901234569', 
-        status: 'inactive', 
-        department: 'Khoa Nhi',
-        position: 'Y tá',
-        experience: '3 năm',
-        avatar: 'https://ui-avatars.com/api/?name=Le+Thi+Hoa&background=f59e0b&color=fff',
-        created_at: '2024-01-20',
-        last_login: '2024-06-10 16:45'
-      }
-    ],
-    parent: [
-      { 
-        id: 1, 
-        name: 'Phạm Văn Đức', 
-        email: 'duc.parent@gmail.com', 
-        phone: '0912345678', 
-        status: 'active', 
-        children_count: 2, 
-        address: 'Quận 1, TP.HCM',
-        occupation: 'Kỹ sư IT',
-        avatar: 'https://ui-avatars.com/api/?name=Pham+Van+Duc&background=8b5cf6&color=fff',
-        created_at: '2024-03-01',
-        last_login: '2024-06-18 07:20'
-      },
-      { 
-        id: 2, 
-        name: 'Nguyễn Thị Mai', 
-        email: 'mai.parent@gmail.com', 
-        phone: '0912345679', 
-        status: 'active', 
-        children_count: 1, 
-        address: 'Quận 3, TP.HCM',
-        occupation: 'Giáo viên',
-        avatar: 'https://ui-avatars.com/api/?name=Nguyen+Thi+Mai&background=ec4899&color=fff',
-        created_at: '2024-03-05',
-        last_login: '2024-06-17 19:30'
-      },
-      { 
-        id: 3, 
-        name: 'Trần Văn Nam', 
-        email: 'nam.parent@gmail.com', 
-        phone: '0912345680', 
-        status: 'inactive', 
-        children_count: 3, 
-        address: 'Quận 7, TP.HCM',
-        occupation: 'Bác sĩ',
-        avatar: 'https://ui-avatars.com/api/?name=Tran+Van+Nam&background=6b7280&color=fff',
-        created_at: '2024-02-20',
-        last_login: '2024-06-05 14:15'
-      }
-    ],
-    student: [
-      { 
-        id: 1, 
-        name: 'Phạm Minh An', 
-        email: 'an.student@school.edu.vn', 
-        phone: '0923456789', 
-        status: 'active', 
-        class: 'Lớp 10A1', 
-        school: 'THPT Nguyễn Du',
-        student_id: 'HS001',
-        grade: '10',
-        avatar: 'https://ui-avatars.com/api/?name=Pham+Minh+An&background=f97316&color=fff',
-        birth_date: '2008-05-15',
-        parent_contact: '0912345678'
-      },
-      { 
-        id: 2, 
-        name: 'Nguyễn Thị Bình', 
-        email: 'binh.student@school.edu.vn', 
-        phone: '0923456790', 
-        status: 'active', 
-        class: 'Lớp 11B2', 
-        school: 'THPT Lê Quý Đôn',
-        student_id: 'HS002',
-        grade: '11',
-        avatar: 'https://ui-avatars.com/api/?name=Nguyen+Thi+Binh&background=06b6d4&color=fff',
-        birth_date: '2007-08-20',
-        parent_contact: '0912345679'
-      },
-      { 
-        id: 3, 
-        name: 'Trần Văn Cường', 
-        email: 'cuong.student@school.edu.vn', 
-        phone: '0923456791', 
-        status: 'inactive', 
-        class: 'Lớp 12C1', 
-        school: 'THPT Trần Hưng Đạo',
-        student_id: 'HS003',
-        grade: '12',
-        avatar: 'https://ui-avatars.com/api/?name=Tran+Van+Cuong&background=84cc16&color=fff',
-        birth_date: '2006-12-10',
-        parent_contact: '0912345680'
-      }
-    ]
-  };
 
   useEffect(() => {
-    setUsers(mockUsers);
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+
+        const [adminRes, nurseRes, parentRes, studentRes] = await Promise.all([
+          axiosClient.get("/admin"),
+          axiosClient.get("/nurse"),
+          axiosClient.get("/parent"),
+          axiosClient.get("/student"),
+        ]);
+
+        setUsers({
+          admin: adminRes.data.data,
+          nurse: nurseRes.data.data,
+          parent: parentRes.data.data,
+          student: studentRes.data.data,
+        });
+      } catch (error) {
+        console.error("Lỗi khi tải dữ liệu người dùng:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
   }, []);
 
   const tabs = [
-    { 
-      key: 'nurse', 
-      label: 'Y tá & Bác sĩ', 
-      icon: Heart, 
+    {
+      key: 'admin',
+      label: 'Admin',
+      icon: Heart,
+      count: users.admin.length,
+      color: 'red',
+      description: 'Quản lý admin'
+    },
+    {
+      key: 'nurse',
+      label: 'Y tá',
+      icon: Heart,
       count: users.nurse.length,
       color: 'blue',
       description: 'Quản lý nhân viên y tế'
     },
-    { 
-      key: 'parent', 
-      label: 'Phụ huynh', 
-      icon: Users, 
+    {
+      key: 'parent',
+      label: 'Phụ huynh',
+      icon: Users,
       count: users.parent.length,
       color: 'purple',
       description: 'Quản lý thông tin phụ huynh'
     },
-    { 
-      key: 'student', 
-      label: 'Học sinh', 
-      icon: GraduationCap, 
+    {
+      key: 'student',
+      label: 'Học sinh',
+      icon: GraduationCap,
       count: users.student.length,
       color: 'green',
       description: 'Quản lý thông tin học sinh'
@@ -193,9 +104,9 @@ const UserManagement = () => {
   ];
 
   const filteredUsers = users[activeTab]?.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.phone.includes(searchTerm)
+    user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user?.phone?.includes(searchTerm)
   ) || [];
 
   const handleStatusToggle = (userId, currentStatus) => {
@@ -225,12 +136,86 @@ const UserManagement = () => {
       setSelectedUsers(new Set(filteredUsers.map(user => user.id)));
     }
   };
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+
+    try {
+      let profile_img_url = '';
+
+      // Nếu người dùng có chọn file ảnh
+      if (selectedImgFile) {
+        const formData = new FormData();
+        formData.append('image', selectedImgFile); // 🔥 Đúng tên key ở backend
+
+        const imgUploadRes = await axiosClient.post("/profile-img", formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+
+        if (imgUploadRes.data?.profile_img_url) {
+          profile_img_url = imgUploadRes.data.profile_img_url;
+        } else {
+          return alert("Upload ảnh thất bại");
+        }
+      }
+
+      const endpointMap = {
+        admin: "/admin",
+        nurse: "/nurse",
+        parent: "/parent",
+        student: "/student",
+      };
+
+      const endpoint = endpointMap[activeTab];
+      if (!endpoint) return alert("Loại người dùng không hợp lệ");
+
+      const payload = {
+        ...newUser,
+        profile_img_url,
+      };
+
+      const response = await axiosClient.post(endpoint, payload);
+
+      if (!response.data.error) {
+        alert(response.data.message || "Tạo thành công");
+
+        setUsers(prev => ({
+          ...prev,
+          [activeTab]: [...prev[activeTab], response.data.data],
+        }));
+
+        setNewUser({});
+        setSelectedImgFile(null);
+        setShowCreateModal(false);
+      } else {
+        alert(response.data.message || "Có lỗi xảy ra");
+      }
+    } catch (error) {
+      console.error("Lỗi tạo người dùng:", error);
+      alert("Lỗi tạo người dùng: " + (error.response?.data?.message || error.message));
+    }
+  };
+
+
+  const handleViewDetail = async (role, id) => {
+    try {
+      const { data, error } = await axiosClient.get(`/${role}/${id}`);
+      if (!error) {
+        setSelectedUserDetail({ role, ...data?.data });
+        setShowDetailModal(true);
+      }
+    } catch (err) {
+      console.error('Lỗi khi lấy thông tin chi tiết:', err);
+    }
+  };
+
+
+
 
   const getActiveTab = () => tabs.find(tab => tab.key === activeTab);
 
   const renderUserCard = (user) => {
     const activeTabData = getActiveTab();
-    
+
     return (
       <div key={user.id} className="group bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-gray-200 transition-all duration-200">
         <div className="p-6">
@@ -245,13 +230,12 @@ const UserManagement = () => {
               />
               <div className="relative">
                 <img
-                  src={user.avatar}
+                  src={user.profile_img_url}
                   alt={user.name}
                   className="w-14 h-14 rounded-full object-cover ring-2 ring-gray-100"
                 />
-                <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
-                  user.status === 'active' ? 'bg-green-500' : 'bg-red-500'
-                }`} />
+                <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${user.email_confirmed === true ? 'bg-green-500' : 'bg-red-500'
+                  }`} />
               </div>
             </div>
 
@@ -261,14 +245,13 @@ const UserManagement = () => {
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-1">{user.name}</h3>
                   <div className="flex items-center gap-2">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      user.status === 'active' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {user.status === 'active' ? 'Hoạt động' : 'Tạm khóa'}
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.email_confirmed === true
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                      }`}>
+                      {user.email_confirmed === true ? 'Xác thực' : 'Chưa xác thực'}
                     </span>
-                    {activeTab === 'nurse' && (
+                    {(activeTab === 'nurse' || activeTab === 'admin') && (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         <Shield className="w-3 h-3 mr-1" />
                         {user.position}
@@ -276,24 +259,23 @@ const UserManagement = () => {
                     )}
                   </div>
                 </div>
-                
+
                 {/* Action Menu */}
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
+                  <button onClick={() => handleViewDetail(activeTab, user.id)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
                     <Eye size={16} />
                   </button>
                   <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all">
                     <Edit3 size={16} />
                   </button>
-                  <button 
-                    onClick={() => handleStatusToggle(user.id, user.status)}
-                    className={`p-2 rounded-lg transition-all ${
-                      user.status === 'active' 
-                        ? 'text-gray-400 hover:text-red-600 hover:bg-red-50' 
-                        : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
-                    }`}
+                  <button
+                    onClick={() => handleStatusToggle(user.id, user.email_confirmed)}
+                    className={`p-2 rounded-lg transition-all ${user.email_confirmed === true
+                      ? 'text-gray-400 hover:text-red-600 hover:bg-red-50'
+                      : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
+                      }`}
                   >
-                    {user.status === 'active' ? <UserX size={16} /> : <UserCheck size={16} />}
+                    {user.email_confirmed === true ? <UserX size={16} /> : <UserCheck size={16} />}
                   </button>
                   <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
                     <Trash2 size={16} />
@@ -303,22 +285,26 @@ const UserManagement = () => {
                   </button>
                 </div>
               </div>
-              
+
               {/* Contact Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                 <div className="space-y-2">
+                  <div className="flex items-center text-gray-600">
+                    <span className="w-16 font-medium">ID:</span>
+                    <span className="text-gray-900 truncate">{user.id}</span>
+                  </div>
                   <div className="flex items-center text-gray-600">
                     <span className="w-16 font-medium">Email:</span>
                     <span className="text-gray-900 truncate">{user.email}</span>
                   </div>
                   <div className="flex items-center text-gray-600">
                     <span className="w-16 font-medium">SĐT:</span>
-                    <span className="text-gray-900">{user.phone}</span>
+                    <span className="text-gray-900">{user.phone_number || "Không có"}</span>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
-                  {activeTab === 'nurse' && (
+                  {/* {activeTab === 'nurse' && (
                     <>
                       <div className="flex items-center text-gray-600">
                         <span className="w-20 font-medium">Khoa:</span>
@@ -329,30 +315,31 @@ const UserManagement = () => {
                         <span className="text-gray-900">{user.experience}</span>
                       </div>
                     </>
-                  )}
-                  
+                  )} */}
+
                   {activeTab === 'parent' && (
                     <>
-                      <div className="flex items-center text-gray-600">
+                      {/* <div className="flex items-center text-gray-600">
                         <span className="w-20 font-medium">Nghề nghiệp:</span>
                         <span className="text-gray-900">{user.occupation}</span>
-                      </div>
+                      </div> */}
                       <div className="flex items-center text-gray-600">
                         <span className="w-20 font-medium">Số con:</span>
-                        <span className="text-gray-900">{user.children_count} học sinh</span>
+                        <span className="text-gray-900">{user?.students?.length || 0} học sinh</span>
                       </div>
                     </>
                   )}
-                  
+
+                  {console.log("user: ", user)}
                   {activeTab === 'student' && (
                     <>
                       <div className="flex items-center text-gray-600">
                         <span className="w-20 font-medium">Mã HS:</span>
-                        <span className="text-gray-900">{user.student_id}</span>
+                        <span className="text-gray-900">{user.id}</span>
                       </div>
                       <div className="flex items-center text-gray-600">
                         <span className="w-20 font-medium">Lớp:</span>
-                        <span className="text-gray-900">{user.class}</span>
+                        <span className="text-gray-900">{user.class_name}</span>
                       </div>
                     </>
                   )}
@@ -360,10 +347,10 @@ const UserManagement = () => {
               </div>
 
               {/* Footer Info */}
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 text-xs text-gray-500">
+              {/* <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 text-xs text-gray-500">
                 <span>Tạo: {user.created_at}</span>
                 {user.last_login && <span>Đăng nhập: {user.last_login}</span>}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -406,33 +393,28 @@ const UserManagement = () => {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`relative p-6 rounded-xl border-2 transition-all text-left ${
-                    isActive
-                      ? 'border-blue-500 bg-blue-50 shadow-lg'
-                      : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
-                  }`}
+                  className={`relative p-6 rounded-xl border-2 transition-all text-left ${isActive
+                    ? 'border-blue-500 bg-blue-50 shadow-lg'
+                    : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
+                    }`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-lg ${
-                      isActive ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
-                    }`}>
+                    <div className={`p-3 rounded-lg ${isActive ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
+                      }`}>
                       <Icon size={24} />
                     </div>
                     <div className="flex-1">
-                      <h3 className={`text-lg font-semibold ${
-                        isActive ? 'text-blue-900' : 'text-gray-900'
-                      }`}>
+                      <h3 className={`text-lg font-semibold ${isActive ? 'text-blue-900' : 'text-gray-900'
+                        }`}>
                         {tab.label}
                       </h3>
-                      <p className={`text-sm ${
-                        isActive ? 'text-blue-600' : 'text-gray-500'
-                      }`}>
+                      <p className={`text-sm ${isActive ? 'text-blue-600' : 'text-gray-500'
+                        }`}>
                         {tab.description}
                       </p>
                     </div>
-                    <div className={`text-2xl font-bold ${
-                      isActive ? 'text-blue-600' : 'text-gray-400'
-                    }`}>
+                    <div className={`text-2xl font-bold ${isActive ? 'text-blue-600' : 'text-gray-400'
+                      }`}>
                       {tab.count}
                     </div>
                   </div>
@@ -455,13 +437,13 @@ const UserManagement = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Hoạt động</p>
+                <p className="text-sm font-medium text-gray-600">Đã xác thực</p>
                 <p className="text-3xl font-bold text-green-600">
-                  {filteredUsers.filter(user => user.status === 'active').length}
+                  {filteredUsers.filter(user => user.email_confirmed === true).length}
                 </p>
               </div>
               <div className="p-3 bg-green-100 rounded-lg">
@@ -469,27 +451,13 @@ const UserManagement = () => {
               </div>
             </div>
           </div>
-          
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Tạm khóa</p>
-                <p className="text-3xl font-bold text-red-600">
-                  {filteredUsers.filter(user => user.status === 'inactive').length}
-                </p>
-              </div>
-              <div className="p-3 bg-red-100 rounded-lg">
-                <UserX className="w-6 h-6 text-red-600" />
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+
+          {/* <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Mới tháng này</p>
                 <p className="text-3xl font-bold text-purple-600">
-                  {users[activeTab]?.filter(user => 
+                  {users[activeTab]?.filter(user =>
                     new Date(user.created_at).getMonth() === new Date().getMonth()
                   ).length || 0}
                 </p>
@@ -498,7 +466,7 @@ const UserManagement = () => {
                 <Plus className="w-6 h-6 text-purple-600" />
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Search and Controls */}
@@ -516,9 +484,9 @@ const UserManagement = () => {
                 />
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
-              <button 
+              <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="flex items-center gap-2 px-4 py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
               >
@@ -526,7 +494,7 @@ const UserManagement = () => {
                 Lọc
                 <ChevronDown size={16} className={`transition-transform ${showFilters ? 'rotate-180' : ''}`} />
               </button>
-              
+
               {selectedUsers.size > 0 && (
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-600">
@@ -537,11 +505,15 @@ const UserManagement = () => {
                   </button>
                 </div>
               )}
-              
-              <button className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition-all">
+
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition-all"
+              >
                 <Plus size={16} />
                 Thêm {activeTabData.label}
               </button>
+
             </div>
           </div>
 
@@ -557,7 +529,7 @@ const UserManagement = () => {
                 />
                 Chọn tất cả ({filteredUsers.length})
               </label>
-              
+
               <div className="text-sm text-gray-500">
                 Hiển thị {filteredUsers.length} trên tổng số {users[activeTab]?.length} {activeTabData.label.toLowerCase()}
               </div>
@@ -581,8 +553,8 @@ const UserManagement = () => {
                 {searchTerm ? 'Không tìm thấy kết quả' : `Chưa có ${activeTabData.label.toLowerCase()}`}
               </h3>
               <p className="text-gray-600 mb-6">
-                {searchTerm 
-                  ? 'Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc' 
+                {searchTerm
+                  ? 'Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc'
                   : `Bắt đầu bằng cách thêm ${activeTabData.label.toLowerCase()} đầu tiên`
                 }
               </p>
@@ -598,6 +570,237 @@ const UserManagement = () => {
           )}
         </div>
       </div>
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg w-full max-w-lg shadow-lg relative">
+            <h2 className="text-xl font-semibold mb-4">Tạo {activeTabData.label}</h2>
+            <form onSubmit={handleCreateUser} className="space-y-4">
+              {/* Upload ảnh */}
+              <input
+                className="w-full border p-2 rounded"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  setSelectedImgFile(file);
+
+                  // Preview
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => setImagePreview(reader.result);
+                    reader.readAsDataURL(file);
+                  } else {
+                    setImagePreview(null);
+                  }
+                }}
+              />
+
+              {/* Hiển thị ảnh xem trước nếu có */}
+              {imagePreview && (
+                <div className="flex justify-center mb-4">
+                  <img
+                    src={imagePreview}
+                    alt="Avatar Preview"
+                    className="w-28 h-28 rounded-full object-cover shadow"
+                  />
+                </div>
+              )}
+
+              {/* Tên */}
+              <input
+                className="w-full border p-2 rounded"
+                type="text"
+                placeholder="Họ và tên"
+                required
+                value={newUser.name || ''}
+                onChange={(e) => setNewUser(prev => ({ ...prev, name: e.target.value }))}
+              />
+
+              {/* Email - bắt buộc với admin, nurse, parent */}
+              {(activeTab !== 'student') && (
+                <input
+                  className="w-full border p-2 rounded"
+                  type="email"
+                  placeholder="Email"
+                  required
+                  value={newUser.email || ''}
+                  onChange={(e) => setNewUser(prev => ({ ...prev, email: e.target.value }))}
+                />
+              )}
+
+              {/* Ngày sinh */}
+              <input
+                className="w-full border p-2 rounded"
+                type="date"
+                placeholder="Ngày sinh"
+                required
+                value={newUser.dob || ''}
+                onChange={(e) => setNewUser(prev => ({ ...prev, dob: e.target.value }))}
+              />
+
+              {/* Giới tính */}
+              <select
+                className="w-full border p-2 rounded"
+                required
+                value={newUser.gender || ''}
+                onChange={(e) => setNewUser(prev => ({ ...prev, gender: e.target.value }))}
+              >
+                <option value="">Chọn giới tính</option>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+              </select>
+
+              {/* Địa chỉ */}
+              <input
+                className="w-full border p-2 rounded"
+                type="text"
+                placeholder="Địa chỉ"
+                required
+                value={newUser.address || ''}
+                onChange={(e) => setNewUser(prev => ({ ...prev, address: e.target.value }))}
+              />
+
+              {/* Số điện thoại */}
+              <input
+                className="w-full border p-2 rounded"
+                type="text"
+                placeholder="Số điện thoại"
+                value={newUser.phone_number || ''}
+                onChange={(e) => setNewUser(prev => ({ ...prev, phone_number: e.target.value }))}
+              />
+
+              {activeTab === 'student' && (
+                <>
+                  {/* Email cho học sinh */}
+                  <input
+                    className="w-full border p-2 rounded"
+                    type="email"
+                    placeholder="Email"
+                    required
+                    value={newUser.email || ''}
+                    onChange={(e) => setNewUser(prev => ({ ...prev, email: e.target.value }))}
+                  />
+
+                  <input
+                    className="w-full border p-2 rounded"
+                    type="text"
+                    placeholder="ID lớp học"
+                    required
+                    value={newUser.class_id || ''}
+                    onChange={(e) => setNewUser(prev => ({ ...prev, class_id: e.target.value }))}
+                  />
+                  <input
+                    className="w-full border p-2 rounded"
+                    type="number"
+                    placeholder="Năm nhập học"
+                    required
+                    value={newUser.year_of_enrollment || ''}
+                    onChange={(e) => setNewUser(prev => ({ ...prev, year_of_enrollment: e.target.value }))}
+                  />
+                  <input
+                    className="w-full border p-2 rounded"
+                    type="text"
+                    placeholder="ID mẹ (nếu có)"
+                    value={newUser.mom_id || ''}
+                    onChange={(e) => setNewUser(prev => ({ ...prev, mom_id: e.target.value }))}
+                  />
+                  <input
+                    className="w-full border p-2 rounded"
+                    type="text"
+                    placeholder="ID bố (nếu có)"
+                    value={newUser.dad_id || ''}
+                    onChange={(e) => setNewUser(prev => ({ ...prev, dad_id: e.target.value }))}
+                  />
+                </>
+              )}
+
+              {/* Nút tạo */}
+              <div className="flex justify-end gap-2 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="px-4 py-2 border rounded"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Tạo mới
+                </button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      )}
+
+      {showDetailModal && selectedUserDetail && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl shadow-lg relative">
+            <h2 className="text-xl font-bold mb-4">Thông tin chi tiết ({selectedUserDetail.role})</h2>
+            <div className="space-y-2">
+              {selectedUserDetail.profile_img_url && (
+                <div className="flex justify-center mb-4">
+                  <img
+                    src={selectedUserDetail.profile_img_url}
+                    alt="Avatar"
+                    className="w-28 h-28 rounded-full object-cover shadow"
+                  />
+                </div>
+              )}
+              <p><b>Họ tên:</b> {selectedUserDetail.name}</p>
+              <p><b>Email:</b> {selectedUserDetail.email}</p>
+              <p><b>Giới tính:</b> {selectedUserDetail.gender}</p>
+              <p><b>Ngày sinh:</b> {new Date(selectedUserDetail.dob).toLocaleDateString()}</p>
+              <p><b>Địa chỉ:</b> {selectedUserDetail.address}</p>
+              <p><b>SĐT:</b> {selectedUserDetail.phone_number}</p>
+              <p><b>Email đã xác nhận:</b> {selectedUserDetail.email_confirmed ? '✅' : '❌'}</p>
+              {selectedUserDetail.year_of_enrollment && (
+                <p><b>Năm nhập học:</b> {selectedUserDetail.year_of_enrollment}</p>
+              )}
+              {selectedUserDetail.class_name && (
+                <p><b>Lớp:</b> {selectedUserDetail.class_name}</p>
+              )}
+
+              {/* Nếu là phụ huynh */}
+              {selectedUserDetail.role === 'parent' && (
+                <>
+                  <h3 className="font-semibold mt-4">Danh sách con:</h3>
+                  <ul className="list-disc pl-5">
+                    {selectedUserDetail.children.map(child => (
+                      <li key={child.id}>{child.name} - {child.class_name}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
+
+              {/* Nếu là học sinh */}
+              {selectedUserDetail.role === 'student' && (
+                <>
+                  <h3 className="font-semibold mt-4">Thông tin phụ huynh:</h3>
+                  <div className="text-sm">
+                    {selectedUserDetail.mom_profile && (
+                      <p><b>Mẹ:</b> {selectedUserDetail.mom_profile.name}</p>
+                    )}
+                    {selectedUserDetail.dad_profile && (
+                      <p><b>Bố:</b> {selectedUserDetail.dad_profile.name}</p>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button onClick={() => setShowDetailModal(false)} className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 };

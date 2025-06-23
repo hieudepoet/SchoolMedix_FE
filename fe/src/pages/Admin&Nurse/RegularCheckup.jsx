@@ -78,7 +78,7 @@ const RegularCheckup = () => {
     setLoadingActions((prev) => ({ ...prev, [campaignId]: true }));
     try {
       const response = await axiosClient.patch(
-        `/checkup-register/${campaignId}/${action}`
+        `/checkup-campaign/${campaignId}/${action}`
       );
       const res = await axiosClient.get("/checkup-campaign");
       setCampaignList(res.data.data || []);
@@ -143,7 +143,7 @@ const RegularCheckup = () => {
       case "ONGOING":
         return {
           text: "Hoàn thành chiến dịch",
-          action: "complete",
+          action: "finish",
           className: "bg-emerald-700 hover:bg-emerald-800 text-white",
           disabled: false,
         };

@@ -113,7 +113,7 @@ const routes = createBrowserRouter([
             element: <AddRegularCheckupCampaign/>
           },
           {
-            path: "checkup-campaign/:checkup-id/register-list",
+            path: "checkup-campaign/:checkup_id/register-list",
             element: <RegularCheckupRegisterList/>
           }
         ],
@@ -269,6 +269,19 @@ const routes = createBrowserRouter([
           {
             path: "regular-checkup",
             element: <RegularCheckup/>
+          },
+          {
+            path: "checkup-campaign/:checkup_id",
+            element: <RegularCheckupDetails/>
+          },
+          {
+            path: "checkup-campaign/:checkup_id/register-list",
+            element: <RegularCheckupRegisterList/>
+          },
+          
+          {
+            path: "disease",
+            element: <DiseaseRecordManagement/>
           }
         ],
       },

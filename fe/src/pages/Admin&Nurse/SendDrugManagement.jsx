@@ -140,8 +140,7 @@ const SendDrugManagement = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            {
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${{
                               PROCESSING: "bg-yellow-100 text-yellow-800",
                               ACCEPTED: "bg-green-100 text-green-800",
                               REFUSED: "bg-red-100 text-red-800",
@@ -149,7 +148,7 @@ const SendDrugManagement = () => {
                               CANCELLED: "bg-gray-100 text-gray-800",
                               RECEIVED: "bg-purple-100 text-purple-800",
                             }[drug.status] || "bg-gray-100 text-gray-800"
-                          }`}
+                            }`}
                         >
                           {drug.status || "Chưa xác định"}
                         </span>
@@ -222,14 +221,14 @@ const SendDrugManagement = () => {
                             "CANCELLED",
                             "REFUSED",
                           ].includes(drug.status) && (
-                            <button
-                              className="text-gray-600 hover:text-gray-800 p-1 rounded hover:bg-gray-50"
-                              onClick={() => handleCancel(drug.id)}
-                              title="Hủy đơn"
-                            >
-                              <XCircle className="w-5 h-5" />
-                            </button>
-                          )}
+                              <button
+                                className="text-gray-600 hover:text-gray-800 p-1 rounded hover:bg-gray-50"
+                                onClick={() => handleCancel(drug.id)}
+                                title="Hủy đơn"
+                              >
+                                <XCircle className="w-5 h-5" />
+                              </button>
+                            )}
                         </div>
                       </td>
                     </tr>
@@ -283,8 +282,7 @@ const SendDrugManagement = () => {
                                       Trạng thái:
                                     </span>{" "}
                                     <span
-                                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                        {
+                                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${{
                                           PROCESSING:
                                             "bg-yellow-100 text-yellow-800",
                                           ACCEPTED:
@@ -297,7 +295,7 @@ const SendDrugManagement = () => {
                                             "bg-purple-100 text-purple-800",
                                         }[drug.status] ||
                                         "bg-gray-100 text-gray-800"
-                                      }`}
+                                        }`}
                                     >
                                       {drug.status || "Chưa xác định"}
                                     </span>
@@ -319,7 +317,7 @@ const SendDrugManagement = () => {
                                           <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                                           {item.name} -{" "}
                                           <span className="font-medium">
-                                            Số lượng: {item.quantity}
+                                            Số lượng: {item.dosage_usage}
                                           </span>
                                         </li>
                                       ))}

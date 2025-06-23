@@ -133,7 +133,7 @@ const Header = ({menuItems}) => {
                       <User className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-sm font-medium text-gray-800 hidden sm:block">
-                      {user?.user_metadata?.name || "Người dùng"}
+                      {user?.name || "Người dùng"}
                     </span>
                   </button>
                 </div>
@@ -190,7 +190,7 @@ const Header = ({menuItems}) => {
               {isLoggedIn && (
                 <div className="border-t mt-2 pt-2">
                   <div className="px-3 py-2 text-sm text-gray-500 font-medium">
-                    {user?.user_metadata?.name || "Người dùng"}
+                    {user?.name || "Người dùng"}
                   </div>
                   {userMenuItems.map((item) => {
                     const Icon = item.icon;

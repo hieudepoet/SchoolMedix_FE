@@ -43,7 +43,7 @@ const HealthProfile = () => {
     );
   }
 
-  if (!childData || !childData.profile) {
+  if (!childData) {
     return (
       <div className="max-w-4xl mx-auto p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -52,8 +52,6 @@ const HealthProfile = () => {
       </div>
     );
   }
-
-  const { profile } = childData;
 
   const InfoRow = ({ label, value, status }) => (
     <div className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
@@ -78,17 +76,17 @@ const HealthProfile = () => {
             <div className="relative">
               <div className="w-20 h-24 bg-blue-100 rounded-lg flex items-center justify-center border border-blue-200">
                 <span className="text-2xl font-bold text-blue-600">
-                  {profile.name?.charAt(0).toUpperCase() || "-"}
+                  {childData.name?.charAt(0).toUpperCase() || "-"}
                 </span>
               </div>
-              {profile.email_verified && (
+              {childData.email_verified && (
                 <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1">
                   <CheckCircle className="w-3 h-3 text-white" />
                 </div>
               )}
             </div>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-900 mb-1">{profile.name || "Không có tên"}</h1>
+              <h1 className="text-2xl font-bold text-gray-900 mb-1">{childData.name || "Không có tên"}</h1>
               <p className="text-blue-600 font-medium">{childData.class_name || "-"}</p>
             </div>
           </div>
@@ -101,8 +99,8 @@ const HealthProfile = () => {
             <div>
               <h2 className="text-lg font-bold text-gray-900 mb-4">Thông tin chung</h2>
               <div className="bg-gray-50 rounded-lg p-4 space-y-1">
-                <InfoRow label="Ngày sinh" value={formatDate(profile.dob)} />
-                <InfoRow label="Giới tính" value={profile.gender} />
+                <InfoRow label="Ngày sinh" value={formatDate(childData.dob)} />
+                <InfoRow label="Giới tính" value={childData.gender} />
                 <InfoRow label="Nơi sinh" value="-" />
                 <InfoRow label="Quốc tịch" value="-" />
                 <InfoRow label="Dân tộc" value="-" />
@@ -132,12 +130,12 @@ const HealthProfile = () => {
 
               <h2 className="text-lg font-bold text-gray-900 mb-4 mt-6">Địa chỉ liên hệ</h2>
               <div className="bg-gray-50 rounded-lg p-4">
-                <p className="text-sm text-gray-900 leading-relaxed">{profile.address || "-"}</p>
+                <p className="text-sm text-gray-900 leading-relaxed">{childData.address || "-"}</p>
               </div>
 
               <h2 className="text-lg font-bold text-gray-900 mb-4 mt-6">Liên hệ khẩn cấp</h2>
               <div className="bg-gray-50 rounded-lg p-4 space-y-1">
-                <InfoRow label="Số điện thoại" value={profile.phone_number} />
+                <InfoRow label="Số điện thoại" value={childData.phone_number} />
                 <InfoRow label="Email phụ huynh" value="-" />
               </div>
             </div>

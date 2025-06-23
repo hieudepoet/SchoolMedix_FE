@@ -62,9 +62,9 @@ const ParentDashboard = () => {
 
       setIsLoading(true);
       try {
-        const res = await axiosClient.get(`/parent/${user?.user_metadata.id}/student`);
-        console.log("Children data: ", res.data.data);
-        setChildren(res.data.data || []);
+        const res = await axiosClient.get(`/parent/${user?.id}`);
+        console.log("Children data: ", res.data.data?.children);
+        setChildren(res.data.data?.children || []);
       } catch (error) {
         console.error("Error at Parent Dashboard:", error);
         setError("Không thể tải thông tin học sinh. Vui lòng thử lại sau.");
@@ -112,13 +112,12 @@ const ParentDashboard = () => {
                   className={`
                     bg-white p-4 rounded-lg shadow-sm border-2 cursor-pointer
                     hover:shadow-md transition-all duration-200
-                    ${
-                      selectedChild?.id === child.id
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300"
+                    ${selectedChild?.id === child.id
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-200 hover:border-gray-300"
                     }
                   `}
-                  aria-label={`Chọn ${child.profile.name}`}
+                  aria-label={`Chọn ${child?.name}`}
                 >
                   <div className="flex items-center gap-3">
                     <div
@@ -127,12 +126,12 @@ const ParentDashboard = () => {
                         ${selectedChild?.id === child.id ? "bg-blue-500" : "bg-gray-400"}
                       `}
                     >
-                      {getInitials(child.profile.name)}
+                      {getInitials(child?.name)}
                     </div>
                     <div>
-                      <h3 className="font-medium text-gray-800">{child.profile.name}</h3>
+                      <h3 className="font-medium text-gray-800">{child?.name}</h3>
                       <p className="text-sm text-gray-600">
-                        {child.class || "Chưa có thông tin lớp"}
+                        {child.class_name || "Chưa có thông tin lớp"}
                       </p>
                     </div>
                   </div>

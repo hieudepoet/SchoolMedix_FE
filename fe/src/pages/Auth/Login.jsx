@@ -4,6 +4,7 @@ import { loginWithEmailAndPassword } from "../../config/Supabase";
 import { saveUser } from "../../service/authService";
 import { useState } from "react";
 import { ClipLoader } from "react-spinners";
+import axiosClient from '../../config/axiosClient';
 
 
 const Login = () => {
@@ -29,15 +30,27 @@ const Login = () => {
     setIsLoading(true);
     e.preventDefault();
     const { email, password } = formData;
-    
+
     const { data, error } = await loginWithEmailAndPassword(email, password);
-    
+
     if (error) {
       enqueueSnackbar(`Login failed: ${error.message}`, { variant: "error" });
     } else {
+      // get role from object retrieved from supabase auth user
+      const role = data.user.app_metadata?.role;
+      const supabase_uid = data.user.id;
+      console.log("Role: " + role);
+      console.log("supabase_uid: ", supabase_uid);
+      // get the supabase_uid and retrieve profile basing on each role
+      const res = await axiosClient(`/user/${supabase_uid}/role/${role}/profile`);
       enqueueSnackbar("Login successful!", { variant: "success" });
-      saveUser(data.user);
-      navigate("/"); 
+      //then save the profile to user object in localStorage
+      const user = res.data.data;
+      saveUser(user);
+      // also confirm email to set that email is being used and signed in successfully
+      await axiosClient.patch(`/role/${role}/user/${user.id}/confirm-email`);
+
+      navigate("/");
     }
     setIsLoading(false);
   };
