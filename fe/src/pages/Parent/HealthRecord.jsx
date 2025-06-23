@@ -53,7 +53,7 @@ useEffect(() => {
   const fetchRecords = async () => {
     setLoading(true);
     try {
-      const response = await axiosClient.get(`/student/${currChild?.id}/daily-health-record`);
+      const response = await axiosClient.get(`/${currChild?.id}/daily-health-record`);
       const fetchedRecords = response.data; // axiosClient interceptor returns response.data directly
       if (!fetchedRecords.error && fetchedRecords.data) {
         setRecords(fetchedRecords.data);
@@ -136,8 +136,8 @@ useEffect(() => {
   const totalPages = Math.ceil(filteredRecords.length / recordsPerPage);
 
   // Get student display name
-  const getStudentDisplay = (studentId) => {
-    return `HS${String(studentId).padStart(6, '0')}`;
+  const getStudentDisplay = (name) => {
+    return name;
   };
 
   // Get status badge
@@ -163,10 +163,10 @@ useEffect(() => {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h1 className="text-4xl font-bold text-gray-800 mb-2">Sức khỏe hằng ngày </h1>
-              <p className="text-gray-600">Theo dõi tình hình sức khỏe của con em tại trường</p>
+              <p className="text-gray-600">Theo dõi tình hình sức khỏe của con tại trường</p>
               {currChild && (
                 <p className="text-lg font-medium text-blue-600 mt-2">
-                  Học sinh: {getStudentDisplay(currChild.id)}
+                  Học sinh: {getStudentDisplay(currChild.name, currChild.id)}
                 </p>
               )}
             </div>

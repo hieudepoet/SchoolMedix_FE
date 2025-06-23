@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axiosClient from '../../config/axiosClient';
+import { useParams } from 'react-router-dom';
 
 const SendDiseaseReport = ({ onClose }) => {
+  const { student_id } = useParams();
   const [formData, setFormData] = useState({
-    student_id: '',
+    student_id: student_id || "",
     disease_id: '',
     diagnosis: '',
     detect_date: '',
@@ -83,8 +85,9 @@ const SendDiseaseReport = ({ onClose }) => {
           type="text"
           name="student_id"
           value={formData.student_id}
-          onChange={handleInputChange}
-          placeholder="Mã Học Sinh"
+          // onChange={handleInputChange}
+          // placeholder="Mã Học Sinh"
+          disabled
           className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
@@ -139,14 +142,26 @@ const SendDiseaseReport = ({ onClose }) => {
           placeholder="Chuyển Đến"
           className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <input
+        {/* <input
           type="text"
           name="status"
           value={formData.status}
           onChange={handleInputChange}
           placeholder="Trạng Thái"
           className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        /> */}
+        <select
+          name="status"
+          value={formData.status}
+          onChange={handleInputChange}
+          placeholder="Trạng thái"
+          className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        >
+          <option value="">Chọn trạng thái</option>
+          <option value="RECOVERED">RECOVERED</option>
+          <option value="UNDER_TREATMENT">UNDER_TREATMENT</option>
+        </select>
         <button
           type="submit"
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
