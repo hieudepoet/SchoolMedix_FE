@@ -121,10 +121,19 @@ const RegularCheckup = () => {
           disabled: false,
           onClick: () => navigate("/nurse/regular-report/" + campaignId),
         };
+      } else if (status === "DONE") {
+        return {
+          text: "Xem báo cáo",
+          action: "view-report",
+          className: "bg-blue-600 hover:bg-blue-700 text-white",
+          disabled: false,
+          onClick: () => navigate("/nurse/regular-checkup-report/" + campaignId),
+        };
       }
       return null;
     }
 
+    // For admin
     switch (status) {
       case "PREPARING":
         return {
@@ -151,9 +160,9 @@ const RegularCheckup = () => {
         return {
           text: "Xem báo cáo",
           action: "view-report",
-          className: "bg-slate-700 hover:bg-slate-800 text-white",
+          className: "bg-blue-600 hover:bg-blue-700 text-white",
           disabled: false,
-          onClick: () => navigate(`/report/${campaignId}`),
+          onClick: () => navigate("/admin/regular-checkup-report/" + campaignId),
         };
       case "CANCELLED":
         return {

@@ -33,6 +33,7 @@ import RegularCheckupRegisterList from "../pages/Admin&Nurse/RegularCheckupRegis
 import RegularCheckupSurvey from "../pages/Parent/RegularCheckupSurvey";
 import CheckupCampaignReport from "../pages/Nurse/CheckupCampaignReport";
 import CompletedVaccineReport from "../pages/Admin&Nurse/CompletedVaccineReport";
+import CompletedRegularCheckupReport from "../pages/Admin&Nurse/CompletedRegularCheckupReport";
 
 const routes = createBrowserRouter([
   {
@@ -71,7 +72,6 @@ const routes = createBrowserRouter([
           {
             path: "vaccine-campaign",
             element: <VaccineCampaignManagement />,
-
           },
           {
             path: "daily-health",
@@ -83,45 +83,49 @@ const routes = createBrowserRouter([
           },
           {
             path: "add-record",
-            element: <AddRecordPage/>
+            element: <AddRecordPage />,
           },
           {
             path: "vaccine-campaign/:id",
-            element: <VaccineCampaignDetails/>
+            element: <VaccineCampaignDetails />,
           },
           {
             path: "vaccine-campaign/student-list/:id",
-            element: <VaccineStudentList/>
+            element: <VaccineStudentList />,
           },
           {
             path: "regular-checkup",
-            element: <RegularCheckup/>
+            element: <RegularCheckup />,
           },
           {
             path: "report/:campaign_id",
-            element: <VaccineReport/>
+            element: <VaccineReport />,
           },
-          
+
           {
             path: "disease-record",
             element: <DiseaseRecordManagement/>
           },
           {
             path: "checkup-campaign/:checkup_id",
-            element: <RegularCheckupDetails/>
+            element: <RegularCheckupDetails />,
           },
           {
             path: "checkup-campaign-creation",
-            element: <AddRegularCheckupCampaign/>
+            element: <AddRegularCheckupCampaign />,
           },
           {
             path: "checkup-campaign/:checkup_id/register-list",
-            element: <RegularCheckupRegisterList/>
+            element: <RegularCheckupRegisterList />,
           },
           {
-            path: "vaccine-campaign/:campaign_id",
-            element: <CompletedVaccineReport/>
-          }
+            path: "vaccine-campaign-report/:campaign_id",
+            element: <CompletedVaccineReport />,
+          },
+          {
+            path: "regular-checkup-report/:checkup_id",
+            element: <CompletedRegularCheckupReport />,
+          },
         ],
       },
     ],
@@ -203,7 +207,7 @@ const routes = createBrowserRouter([
         children: [
           {
             path: "survey/:campaign_id",
-            element: <Survey/>
+            element: <Survey />,
           },
           {
             path: "health-profile",
@@ -223,11 +227,11 @@ const routes = createBrowserRouter([
           },
           {
             path: "health-record",
-            element: <HealthRecord/>
+            element: <HealthRecord />,
           },
           {
             path: "regular-checkup",
-            element: <StudentRegularCheckup/>
+            element: <StudentRegularCheckup />,
           },
           {
             path: "disease-record",
@@ -235,7 +239,7 @@ const routes = createBrowserRouter([
           },
           {
             path: "surveyCheckup/:campaign_id",
-            element: <RegularCheckupSurvey/>
+            element: <RegularCheckupSurvey />,
           },
         ],
       },
@@ -263,39 +267,48 @@ const routes = createBrowserRouter([
           },
           {
             path: "add-record",
-            element: <AddRecordPage/>
-          },{
+            element: <AddRecordPage />,
+          },
+          {
             path: "vaccine-campaign",
-            element: <VaccineCampaignManagement/>
+            element: <VaccineCampaignManagement />,
           },
           {
             path: "report/:campaign_id",
-            element: <VaccineReport/>
+            element: <VaccineReport />,
           },
           {
             path: "regular-checkup",
-            element: <RegularCheckup/>
+            element: <RegularCheckup />,
           },
           {
             path: "checkup-campaign/:checkup_id",
-            element: <RegularCheckupDetails/>
+            element: <RegularCheckupDetails />,
           },
           {
             path: "checkup-campaign/:checkup_id/register-list",
-            element: <RegularCheckupRegisterList/>
+            element: <RegularCheckupRegisterList />,
           },
-          
+
           {
             path: "disease",
-            element: <DiseaseRecordManagement/>
+            element: <DiseaseRecordManagement />,
           },
           {
             path: "regular-report/:checkup_id",
-            element: <CheckupCampaignReport/>
+            element: <CheckupCampaignReport />,
           },
           {
-            path: "vaccine-campaign/:campaign_id",
-            element: <CompletedVaccineReport/>
+            path: "vaccine-campaign-report/:campaign_id",
+            element: <CompletedVaccineReport />,
+          },
+          {
+            path: "regular-checkup-report/:checkup_id",
+            element: <CompletedRegularCheckupReport />,
+          },
+          {
+            path: "vaccine-campaign/:id",
+            element: <VaccineCampaignDetails />,
           }
         ],
       },

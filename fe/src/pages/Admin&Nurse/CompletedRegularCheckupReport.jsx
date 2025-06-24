@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosClient from "../../config/axiosClient";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
-const CheckupCampaignReport = () => {
+const CompletedRegularCheckupReport = () => {
   const [generalHealthList, setGeneralHealthList] = useState([]);
   const [specialistList, setSpecialistList] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("Khám tổng quát"); // Tab mặc định
+  const [activeTab, setActiveTab] = useState("Khám tổng quát");
   const { checkup_id } = useParams();
   const navigate = useNavigate();
 
@@ -25,17 +24,17 @@ const CheckupCampaignReport = () => {
       console.log("GENERAL LIST: ", res.data.data);
       setGeneralHealthList(res.data.data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching general list:", error);
     }
   };
 
   const fetchSpecialist = async () => {
     try {
-      const res = await axiosClient.get(`/campaign/${checkup_id}/specialist-exam/record`); // API trả về danh sách specialist
+      const res = await axiosClient.get(`/campaign/${checkup_id}/specialist-exam/record`);
       console.log("SPECIALIST: ", res.data.data);
       setSpecialistList(res.data.data);
     } catch (error) {
-      console.log("Error fetching specialist: ", error);
+      console.error("Error fetching specialist:", error);
     }
   };
 
@@ -44,43 +43,19 @@ const CheckupCampaignReport = () => {
     fetchSpecialist();
   }, [checkup_id]);
 
-  const handleStatusUpdate = async (speId, registerId, currentStatus, type = "general") => {
-    if (currentStatus === "DONE") return; // Không cho phép thay đổi nếu đã DONE
-
-    setLoading(true);
-    try {
-      if (type === "general") {
-        // Cập nhật trạng thái cho khám tổng quát
-        await axiosClient.patch(`/health-record/${registerId}/done`);
-        fetchGeneralList();
-      } else {
-        // Cập nhật trạng thái cho khám chuyên khoa (endpoint giả lập)
-        console.log("SPE: ", speId);
-        await axiosClient.patch(`/checkup-register/${registerId}/specialist-exam/${speId}/done`);
-        fetchSpecialist();
-      }
-      console.log(`Updated status for register_id ${registerId} to DONE`);
-    } catch (error) {
-      console.error("Error updating status:", error);
-      alert("Có lỗi xảy ra khi cập nhật trạng thái!");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const getStatusBadge = (status) => {
-    return status === "WAITING" ? (
-      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-        Chờ khám
-      </span>
-    ) : (
+    return status === "DONE" ? (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
         Hoàn thành
+      </span>
+    ) : (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+        Không khám
       </span>
     );
   };
 
-  const renderHealthTable = (records, type = "general") => (
+  const renderHealthTable = (records) => (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
@@ -96,9 +71,6 @@ const CheckupCampaignReport = () => {
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Trạng thái
-            </th>
-            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Hoàn thành
             </th>
           </tr>
         </thead>
@@ -117,26 +89,6 @@ const CheckupCampaignReport = () => {
               <td className="px-6 py-4 whitespace-nowrap">
                 {getStatusBadge(item.status)}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-center">
-                <button
-                  onClick={() =>
-                    handleStatusUpdate(item.spe_exam_id, item.register_id, item.status, type)
-                  }
-                  disabled={item.status === "DONE" || loading}
-                  className={`inline-flex items-center justify-center w-8 h-8 rounded-full transition-colors ${
-                    item.status === "DONE"
-                      ? "bg-green-100 text-green-600 cursor-not-allowed"
-                      : "bg-gray-100 text-gray-400 hover:bg-blue-100 hover:text-blue-600 cursor-pointer"
-                  } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-                  title={
-                    item.status === "DONE"
-                      ? "Đã hoàn thành"
-                      : "Đánh dấu hoàn thành"
-                  }
-                >
-                  <Check className="h-4 w-4" />
-                </button>
-              </td>
             </tr>
           ))}
         </tbody>
@@ -151,12 +103,12 @@ const CheckupCampaignReport = () => {
 
   const getTabData = (tabName) => {
     if (tabName === "Khám tổng quát") {
-      return { records: generalHealthList, type: "general" };
+      return { records: generalHealthList };
     }
     const specialistData = specialistList.find((item) => item.name === tabName) || {
       records: [],
     };
-    return { records: specialistData.records, type: "specialist" };
+    return { records: specialistData.records };
   };
 
   return (
@@ -198,10 +150,10 @@ const CheckupCampaignReport = () => {
             Tổng số: {getTabData(activeTab).records.length} học sinh
           </p>
         </div>
-        {renderHealthTable(getTabData(activeTab).records, getTabData(activeTab).type)}
+        {renderHealthTable(getTabData(activeTab).records)}
       </div>
     </div>
   );
 };
 
-export default CheckupCampaignReport;
+export default CompletedRegularCheckupReport;

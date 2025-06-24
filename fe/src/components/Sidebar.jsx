@@ -5,6 +5,7 @@
     LogOut,
     CalendarDaysIcon,
     User2Icon,
+    User2,
   } from "lucide-react";
   import React, { useEffect, useState } from "react";
   import { MdOutlineSchool } from "react-icons/md";
@@ -91,7 +92,7 @@
     }, [localStorage.getItem("user")]);
 
     const bottomItems = [
-      { title: "Cài đặt", action: "settings", icon: <Settings /> },
+      { title: getUserRole().toString().toUpperCase(), action: "", icon: <User2 /> },
       { title: "Đăng xuất", action: "logout", icon: <LogOut /> },
     ];
 
