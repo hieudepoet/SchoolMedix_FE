@@ -34,6 +34,9 @@ import RegularCheckupSurvey from "../pages/Parent/RegularCheckupSurvey";
 import CheckupCampaignReport from "../pages/Nurse/CheckupCampaignReport";
 import CompletedVaccineReport from "../pages/Admin&Nurse/CompletedVaccineReport";
 import CompletedRegularCheckupReport from "../pages/Admin&Nurse/CompletedRegularCheckupReport";
+import SpecialtyManagement from "../pages/Admin&Nurse/SpecialtyManagement";
+import VaccineManagement from "../pages/Admin&Nurse/VaccineManagement";
+import SpecialistExamManagement from "../pages/Admin/SpecialistExamManagement";
 
 const routes = createBrowserRouter([
   {
@@ -126,6 +129,14 @@ const routes = createBrowserRouter([
             path: "regular-checkup-report/:checkup_id",
             element: <CompletedRegularCheckupReport />,
           },
+          {
+            path: "regular-checkup/specialty-management",
+            element: <SpecialistExamManagement />,
+          },
+          {
+            path: "vaccine-campaign/vaccine-management",
+            element: <VaccineManagement/>
+          }
         ],
       },
     ],
@@ -309,6 +320,14 @@ const routes = createBrowserRouter([
           {
             path: "vaccine-campaign/:id",
             element: <VaccineCampaignDetails />,
+          },
+          {
+            path: "regular-checkup/specialty-management",
+            element: <SpecialistExamManagement />,
+          },
+          {
+            path: "vaccine-campaign/vaccine-management",
+            element: <VaccineManagement/>
           }
         ],
       },

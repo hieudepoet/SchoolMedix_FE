@@ -143,13 +143,12 @@ const AddDiseaseRecord = ({ onClose }) => {
           name="status"
           value={formData.status}
           onChange={handleInputChange}
-          placeholder="Trạng thái"
           className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         >
           <option value="">Chọn trạng thái</option>
-          <option value="RECOVERED">RECOVERED</option>
-          <option value="UNDER_TREATMENT">UNDER_TREATMENT</option>
+          <option value="UNDER_TREATMENT">Đang điều trị</option>
+          <option value="RECOVERED">Đã khỏi</option>
         </select>
         <button
           type="submit"

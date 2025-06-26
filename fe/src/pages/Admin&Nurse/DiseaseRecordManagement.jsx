@@ -45,7 +45,7 @@ const DiseaseRecordManagement = () => {
                   </svg>
                 </div>
                 <div className="flex gap-2">
-                  {["Bệnh truyền nhiễm", "Bệnh mãn tính"].map((category) => (
+                  {["Bệnh truyền nhiễm", "Bệnh mãn tính", "Tất cả bệnh"].map((category) => (
                     <button
                       key={category}
                       onClick={() => setCategoryFilter(category)}
@@ -58,12 +58,6 @@ const DiseaseRecordManagement = () => {
                       {category}
                     </button>
                   ))}
-                  <button
-                    onClick={() => setCategoryFilter()}
-                    className="px-4 py-2 rounded-lg font-medium text-slate-600 bg-slate-100 hover:bg-slate-200"
-                  >
-                    Xóa bộ lọc
-                  </button>
                 </div>
               </div>
               <button

@@ -4,7 +4,7 @@ import axiosClient from "../config/axiosClient";
 const useDiseaseRecords = () => {
   const [records, setRecords] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("Bệnh truyền nhiễm");
+  const [categoryFilter, setCategoryFilter] = useState("Tất cả bệnh");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,12 +17,25 @@ const useDiseaseRecords = () => {
           setLoading(false);
           return;
         }
-        const endpoint = categoryFilter === "Bệnh truyền nhiễm" ? "/infectious-record" : "/chronic-record";
+        let endpoint;
+        switch (categoryFilter) {
+          case "Bệnh truyền nhiễm":
+            endpoint = "/infectious-record";
+            break;
+          case "Bệnh mãn tính":
+            endpoint = "/chronic-record";
+            break;
+          case "Tất cả bệnh":
+            endpoint = "/disease-record";
+        }
         const response = await axiosClient.get(endpoint);
         if (response.data.error === false || response.data.data) {
           setRecords(response.data.data || []);
         } else {
-          setError("Không thể tải hồ sơ: " + (response.data.message || "Lỗi không xác định"));
+          setError(
+            "Không thể tải hồ sơ: " +
+              (response.data.message || "Lỗi không xác định")
+          );
         }
       } catch (err) {
         setError("Lỗi server: " + err.message);
@@ -44,7 +57,15 @@ const useDiseaseRecords = () => {
     [records, searchTerm]
   );
 
-  return { records: filteredRecords, searchTerm, setSearchTerm, categoryFilter, setCategoryFilter, loading, error };
+  return {
+    records: filteredRecords,
+    searchTerm,
+    setSearchTerm,
+    categoryFilter,
+    setCategoryFilter,
+    loading,
+    error,
+  };
 };
 
 export default useDiseaseRecords;

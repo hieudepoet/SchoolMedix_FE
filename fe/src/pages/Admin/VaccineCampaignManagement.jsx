@@ -14,7 +14,7 @@ import {
   Activity,
   Users,
 } from "lucide-react";
-import { getUser, getUserRole } from "../../service/authService";
+import { getUserRole } from "../../service/authService";
 import axiosClient from "../../config/axiosClient";
 import { useNavigate } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
