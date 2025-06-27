@@ -1,33 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosClient from "../../config/axiosClient";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { enqueueSnackbar } from "notistack";
 
 const RegularCheckupRegisterList = () => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { checkup_id } = useParams();
   const navigate = useNavigate();
 
   console.log("ID: ", checkup_id);
 
-  useEffect(() => {
-    const fetchList = async () => {
-      try {
-        setLoading(true);
-        const res = await axiosClient.get("/checkup-register/" + checkup_id);
-        console.log("LIST: ", res.data.data);
-        setList(res.data.data);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setError("Không thể tải danh sách đăng ký");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchList();
+  const fetchList = useCallback(async () => {
+    try {
+      setLoading(true);
+      setIsRefreshing(true);
+      const res = await axiosClient.get("/checkup-register/" + checkup_id);
+      console.log("LIST: ", res.data.data);
+      setList(res.data.data || []);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setError("Không thể tải danh sách đăng ký");
+      enqueueSnackbar("Không thể tải danh sách đăng ký", { variant: "error" });
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
   }, [checkup_id]);
+
+  useEffect(() => {
+    fetchList();
+  }, [fetchList]);
+
+  const handleRefresh = () => {
+    fetchList();
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -78,10 +89,13 @@ const RegularCheckupRegisterList = () => {
     }
   };
 
-  if (loading) {
+  if (loading && !isRefreshing) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+          <p className="text-gray-600">Đang tải danh sách đăng ký...</p>
+        </div>
       </div>
     );
   }
@@ -89,20 +103,56 @@ const RegularCheckupRegisterList = () => {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-md p-4">
-        <div className="text-red-800">{error}</div>
+        <div className="text-red-800 mb-4">{error}</div>
+        <button
+          onClick={handleRefresh}
+          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200"
+        >
+          <Loader2 className={`w-5 h-5 ${isRefreshing ? "animate-spin" : "hidden"}`} />
+          <span>Thử lại</span>
+        </button>
       </div>
     );
   }
 
   return (
     <div className="p-6">
-      <div className="mb-4">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <button
+            onClick={() => navigate("/nurse/regular-checkup")}
+            className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Quay lại
+          </button>
+        </div>
         <button
-          onClick={() => navigate("/nurse/regular-checkup")}
-          className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors"
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+          className={`flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 ${
+            isRefreshing ? "opacity-75 cursor-not-allowed" : ""
+          }`}
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Quay lại
+          {isRefreshing ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+          )}
+          <span>Làm mới</span>
         </button>
       </div>
       <div className="mb-6">
@@ -196,7 +246,7 @@ const RegularCheckupRegisterList = () => {
       </div>
 
       {list.length > 0 && (
-        <div className="mt-4 text-sm text-gray-500">
+        <div className="mt-4 text-sm text-gray-600">
           Hiển thị {list.length} kết quả
         </div>
       )}

@@ -12,6 +12,7 @@ import {
   FileText,
   Activity,
   Users,
+  Loader2,
 } from "lucide-react";
 import axiosClient from "../../config/axiosClient";
 import { getUserRole } from "../../service/authService";
@@ -31,42 +32,44 @@ const RegularCheckup = () => {
   const [error, setError] = useState(null);
   const [loadingActions, setLoadingActions] = useState({});
   const [userRole, setUserRole] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    const fetchCampaign = async () => {
-      try {
-        setLoading(true);
-        const res = await axiosClient.get("/checkup-campaign");
-        const campaigns = res.data.data || [];
-        setCampaignList(campaigns);
-        console.log("CHECKUP LIST: ", campaigns);
-        const ids = campaigns.map((c) => c.id);
-        if (new Set(ids).size !== ids.length) {
-          console.error("Duplicate campaign IDs detected:", ids);
-        }
-        setLoading(false);
-      } catch (err) {
-        setError("Không thể tải danh sách chiến dịch khám sức khỏe");
-        setLoading(false);
-        console.error("Error fetching campaigns:", err);
+  const fetchCampaigns = useCallback(async () => {
+    try {
+      setLoading(true);
+      setIsRefreshing(true);
+      const res = await axiosClient.get("/checkup-campaign");
+      const campaigns = res.data.data || [];
+      setCampaignList(campaigns);
+      console.log("CHECKUP LIST: ", campaigns);
+      const ids = campaigns.map((c) => c.id);
+      if (new Set(ids).size !== ids.length) {
+        console.error("Duplicate campaign IDs detected:", ids);
       }
-    };
-
-    fetchCampaign();
-    const role = getUserRole();
-    setUserRole(role);
+      setError(null);
+    } catch (err) {
+      setError("Không thể tải danh sách chiến dịch khám sức khỏe");
+      console.error("Error fetching campaigns:", err);
+      enqueueSnackbar("Không thể tải danh sách chiến dịch", { variant: "error" });
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
   }, []);
 
-  const toggleExpanded = useCallback(
-    (id, e) => {
-      e.stopPropagation();
-      setExpandedItems((prev) => ({
-        ...prev,
-        [id]: !prev[id],
-      }));
-    },
-    []
-  );
+  useEffect(() => {
+    fetchCampaigns();
+    const role = getUserRole();
+    setUserRole(role);
+  }, [fetchCampaigns]);
+
+  const toggleExpanded = useCallback((id, e) => {
+    e.stopPropagation();
+    setExpandedItems((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  }, []);
 
   const navigate = useNavigate();
 
@@ -80,18 +83,21 @@ const RegularCheckup = () => {
       const response = await axiosClient.patch(
         `/checkup-campaign/${campaignId}/${action}`
       );
-      const res = await axiosClient.get("/checkup-campaign");
-      setCampaignList(res.data.data || []);
-      enqueueSnackbar("Something went wrong!", { variant: "info" });
+      await fetchCampaigns();
+      enqueueSnackbar(response?.data.message || "Thành công!", { variant: "info" });
     } catch (error) {
       console.error(
         `Error performing ${action} on campaign ${campaignId}:`,
-        error.response.data.message
+        error.response?.data?.message || error.message
       );
-      enqueueSnackbar("Something went wrong!", { variant: "error" });
+      enqueueSnackbar(error.response?.data?.message || "Có lỗi xảy ra!", { variant: "error" });
     } finally {
       setLoadingActions((prev) => ({ ...prev, [campaignId]: false }));
     }
+  };
+
+  const handleRefresh = () => {
+    fetchCampaigns();
   };
 
   const getStatusIcon = (status) => {
@@ -133,7 +139,6 @@ const RegularCheckup = () => {
       return null;
     }
 
-    // For admin
     switch (status) {
       case "PREPARING":
         return {
@@ -176,11 +181,11 @@ const RegularCheckup = () => {
     }
   };
 
-  if (loading) {
+  if (loading && !isRefreshing) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900"></div>
+          <Loader2 className="h-12 w-12 animate-spin text-slate-900" />
           <p className="text-slate-600">Đang tải danh sách chiến dịch...</p>
         </div>
       </div>
@@ -197,7 +202,7 @@ const RegularCheckup = () => {
           </div>
           <p className="text-slate-600 mb-4">{error}</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={handleRefresh}
             className="w-full bg-slate-900 text-white py-2 px-4 rounded-lg hover:bg-slate-800 transition-colors"
           >
             Thử lại
@@ -222,15 +227,44 @@ const RegularCheckup = () => {
                   : "Theo dõi và cập nhật báo cáo chiến dịch khám sức khỏe"}
               </p>
             </div>
-            {userRole === "admin" && (
+            <div className="flex items-center space-x-4">
+              {userRole === "admin" && (
+                <button
+                  onClick={handleAddNewCampaign}
+                  className="flex items-center space-x-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span>Tạo chiến dịch mới</span>
+                </button>
+              )}
               <button
-                onClick={handleAddNewCampaign}
-                className="flex items-center space-x-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm"
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className={`flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 ${
+                  isRefreshing ? "opacity-75 cursor-not-allowed" : ""
+                }`}
               >
-                <Plus className="w-5 h-5" />
-                <span>Tạo chiến dịch mới</span>
+                {isRefreshing ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                )}
+                <span>Làm mới</span>
               </button>
-            )}
+            </div>
           </div>
         </div>
       </div>
@@ -259,7 +293,7 @@ const RegularCheckup = () => {
         </div>
 
         <div className="space-y-4">
-          {campaignList.map((campaign, index) => {
+          {campaignList.map((campaign) => {
             const primaryAction = getPrimaryActionConfig(campaign.status, campaign.id);
             const isLoading = loadingActions[campaign.id];
 
@@ -343,7 +377,7 @@ const RegularCheckup = () => {
                     <div className="mt-6 pt-6 border-t border-slate-200 flex flex-wrap gap-3">
                       <button
                         className="px-5 py-2.5 bg-slate-600 hover:bg-slate-700 text-white font-medium rounded-lg transition-colors duration-200"
-                        onClick={() => navigate(`/${getUserRole()}/checkup-campaign/${index}`)}
+                        onClick={() => navigate(`/${getUserRole()}/checkup-campaign/${campaign.id}`)}
                       >
                         <FileText className="w-4 h-4 inline mr-2" />
                         Xem chi tiết
@@ -366,13 +400,11 @@ const RegularCheckup = () => {
                         >
                           {isLoading ? (
                             <>
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              <Loader2 className="w-4 h-4 animate-spin" />
                               <span>Đang xử lý...</span>
                             </>
                           ) : (
-                            <>
-                              {primaryAction.text}
-                            </>
+                            <span>{primaryAction.text}</span>
                           )}
                         </button>
                       )}

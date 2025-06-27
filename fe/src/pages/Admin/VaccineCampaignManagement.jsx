@@ -13,6 +13,7 @@ import {
   Edit,
   Activity,
   Users,
+  Loader2, // Add Loader2 for refresh button
 } from "lucide-react";
 import { getUserRole } from "../../service/authService";
 import axiosClient from "../../config/axiosClient";
@@ -30,26 +31,32 @@ const VaccineCampaignManagement = () => {
   const [expandedItems, setExpandedItems] = useState({});
   const [loadingActions, setLoadingActions] = useState({});
   const [userRole, setUserRole] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false); // New state for refresh loading
+
+  const fetchCampaigns = useCallback(async () => {
+    try {
+      setIsRefreshing(true);
+      const res = await axiosClient.get("/vaccination-campaign");
+      const campaigns = res.data.data || [];
+      setCampaignList(campaigns);
+      console.log("Campaign list:", campaigns);
+      const ids = campaigns.map((c) => c.campaign_id);
+      if (new Set(ids).size !== ids.length) {
+        console.error("Duplicate campaign IDs detected:", ids);
+      }
+    } catch (error) {
+      console.error("Error fetching campaigns:", error);
+      enqueueSnackbar("Không thể tải danh sách chiến dịch", { variant: "error" });
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchCam = async () => {
-      try {
-        const res = await axiosClient.get("/vaccination-campaign");
-        const campaigns = res.data.data || [];
-        setCampaignList(campaigns);
-        console.log("Campaign list:", campaigns);
-        const ids = campaigns.map((c) => c.campaign_id);
-        if (new Set(ids).size !== ids.length) {
-          console.error("Duplicate campaign IDs detected:", ids);
-        }
-      } catch (error) {
-        console.error("Error fetching campaigns:", error);
-      }
-    };
-    fetchCam();
+    fetchCampaigns();
     const role = getUserRole();
     setUserRole(role);
-  }, []);
+  }, [fetchCampaigns]);
 
   const toggleExpanded = useCallback((id, e) => {
     e.stopPropagation();
@@ -71,8 +78,7 @@ const VaccineCampaignManagement = () => {
       const response = await axiosClient.patch(
         `/vaccination-campaign/${campaignId}/${action}`
       );
-      const res = await axiosClient.get("/vaccination-campaign");
-      setCampaignList(res.data.data || []);
+      await fetchCampaigns(); // Reuse fetchCampaigns instead of direct API call
       enqueueSnackbar(response?.data.message, { variant: "info" });
     } catch (error) {
       console.error(
@@ -83,6 +89,10 @@ const VaccineCampaignManagement = () => {
     } finally {
       setLoadingActions((prev) => ({ ...prev, [campaignId]: false }));
     }
+  };
+
+  const handleRefresh = () => {
+    fetchCampaigns();
   };
 
   const getStatusIcon = (status) => {
@@ -110,7 +120,7 @@ const VaccineCampaignManagement = () => {
           action: "edit-report",
           className: "bg-indigo-700 hover:bg-indigo-800 text-white",
           disabled: false,
-          onClick: () => navigate("/"+getUserRole()+"/report/" + campaignId),
+          onClick: () => navigate("/" + getUserRole() + "/report/" + campaignId),
         };
       } else if (status === "COMPLETED") {
         return {
@@ -119,7 +129,7 @@ const VaccineCampaignManagement = () => {
           className: "bg-slate-700 hover:bg-slate-800 text-white",
           disabled: false,
           onClick: () => {
-            console.log("ROLE: ",getUserRole())
+            console.log("ROLE: ", getUserRole());
             navigate(`/${getUserRole()}/vaccine-campaign-report/${campaignId}`);
           },
         };
@@ -184,15 +194,44 @@ const VaccineCampaignManagement = () => {
                   : "Theo dõi và cập nhật báo cáo chiến dịch tiêm chủng"}
               </p>
             </div>
-            {userRole === "admin" && (
+            <div className="flex items-center space-x-4">
+              {userRole === "admin" && (
+                <button
+                  onClick={handleAddNewCampaign}
+                  className="flex items-center space-x-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span>Tạo chiến dịch mới</span>
+                </button>
+              )}
               <button
-                onClick={handleAddNewCampaign}
-                className="flex items-center space-x-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm"
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className={`flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 ${
+                  isRefreshing ? "opacity-75 cursor-not-allowed" : ""
+                }`}
               >
-                <Plus className="w-5 h-5" />
-                <span>Tạo chiến dịch mới</span>
+                {isRefreshing ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                )}
+                <span>Làm mới</span>
               </button>
-            )}
+            </div>
           </div>
         </div>
       </div>
@@ -203,8 +242,7 @@ const VaccineCampaignManagement = () => {
             {
               status: "COMPLETED",
               label: "Hoàn thành",
-              count: campaignList.filter((c) => c.status === "COMPLETED")
-                .length,
+              count: campaignList.filter((c) => c.status === "COMPLETED").length,
             },
             {
               status: "ONGOING",
@@ -214,8 +252,7 @@ const VaccineCampaignManagement = () => {
             {
               status: "PREPARING",
               label: "Chuẩn bị",
-              count: campaignList.filter((c) => c.status === "PREPARING")
-                .length,
+              count: campaignList.filter((c) => c.status === "PREPARING").length,
             },
             {
               status: "UPCOMING",
@@ -225,8 +262,7 @@ const VaccineCampaignManagement = () => {
             {
               status: "CANCELLED",
               label: "Đã hủy",
-              count: campaignList.filter((c) => c.status === "CANCELLED")
-                .length,
+              count: campaignList.filter((c) => c.status === "CANCELLED").length,
             },
           ].map(({ status, label, count }) => (
             <div
@@ -235,12 +271,8 @@ const VaccineCampaignManagement = () => {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-600 mb-1">
-                    {label}
-                  </p>
-                  <p className="text-2xl font-semibold text-slate-900">
-                    {count}
-                  </p>
+                  <p className="text-sm font-medium text-slate-600 mb-1">{label}</p>
+                  <p className="text-2xl font-semibold text-slate-900">{count}</p>
                 </div>
                 <div className={`p-2 rounded-lg ${getStatusColor(status)}`}>
                   {getStatusIcon(status)}
@@ -252,10 +284,7 @@ const VaccineCampaignManagement = () => {
 
         <div className="space-y-4">
           {campaignList.map((campaign) => {
-            const primaryAction = getPrimaryActionConfig(
-              campaign.status,
-              campaign.campaign_id
-            );
+            const primaryAction = getPrimaryActionConfig(campaign.status, campaign.campaign_id);
             const isLoading = loadingActions[campaign.campaign_id];
 
             return (
@@ -284,9 +313,7 @@ const VaccineCampaignManagement = () => {
                       </h3>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <span className="text-sm text-slate-500 font-medium">
-                        Chi tiết
-                      </span>
+                      <span className="text-sm text-slate-500 font-medium">Chi tiết</span>
                       {expandedItems[campaign.campaign_id] ? (
                         <ChevronUp className="w-5 h-5 text-slate-400" />
                       ) : (
@@ -308,9 +335,7 @@ const VaccineCampaignManagement = () => {
                             <p className="text-sm font-medium text-slate-700 mb-1">
                               Thời gian bắt đầu
                             </p>
-                            <p className="text-base text-slate-900">
-                              {formatDate(campaign.start_date)}
-                            </p>
+                            <p className="text-base text-slate-900">{formatDate(campaign.start_date)}</p>
                           </div>
                         </div>
                         <div className="flex items-start space-x-4">
@@ -321,9 +346,7 @@ const VaccineCampaignManagement = () => {
                             <p className="text-sm font-medium text-slate-700 mb-1">
                               Thời gian kết thúc
                             </p>
-                            <p className="text-base text-slate-900">
-                              {formatDate(campaign.end_date)}
-                            </p>
+                            <p className="text-base text-slate-900">{formatDate(campaign.end_date)}</p>
                           </div>
                         </div>
                       </div>
@@ -336,9 +359,7 @@ const VaccineCampaignManagement = () => {
                             <p className="text-sm font-medium text-slate-700 mb-1">
                               Địa điểm thực hiện
                             </p>
-                            <p className="text-base text-slate-900">
-                              {campaign.location}
-                            </p>
+                            <p className="text-base text-slate-900">{campaign.location}</p>
                           </div>
                         </div>
                         <div className="flex items-start space-x-4">
@@ -349,9 +370,7 @@ const VaccineCampaignManagement = () => {
                             <p className="text-sm font-medium text-slate-700 mb-1">
                               Vaccine sử dụng
                             </p>
-                            <p className="text-base text-slate-900">
-                              {campaign.vaccine_name}
-                            </p>
+                            <p className="text-base text-slate-900">{campaign.vaccine_name}</p>
                             <p className="text-sm text-slate-500">
                               Mã vaccine: {campaign.vaccine_id}
                             </p>
@@ -364,11 +383,7 @@ const VaccineCampaignManagement = () => {
                       <button
                         className="px-5 py-2.5 bg-slate-600 hover:bg-slate-700 text-white font-medium rounded-lg transition-colors duration-200"
                         onClick={() =>
-                          navigate(
-                            `/${getUserRole()}/vaccine-campaign/${
-                              campaign.campaign_id
-                            }`
-                          )
+                          navigate(`/${getUserRole()}/vaccine-campaign/${campaign.campaign_id}`)
                         }
                       >
                         <FileText className="w-4 h-4 inline mr-2" />
@@ -381,17 +396,12 @@ const VaccineCampaignManagement = () => {
                             primaryAction.onClick ||
                             (() => {
                               if (primaryAction.action) {
-                                handleCampaignAction(
-                                  campaign.campaign_id,
-                                  primaryAction.action
-                                );
+                                handleCampaignAction(campaign.campaign_id, primaryAction.action);
                               }
                             })
                           }
                           disabled={primaryAction.disabled || isLoading}
-                          className={`px-5 py-2.5 font-medium rounded-lg transition-colors duration-200 ${
-                            primaryAction.className
-                          } ${
+                          className={`px-5 py-2.5 font-medium rounded-lg transition-colors duration-200 ${primaryAction.className} ${
                             isLoading ? "opacity-75 cursor-not-allowed" : ""
                           } flex items-center space-x-2`}
                         >
@@ -412,15 +422,9 @@ const VaccineCampaignManagement = () => {
                       )}
 
                       {userRole === "admin" &&
-                        (campaign.status === "PREPARING" ||
-                          campaign.status === "UPCOMING") && (
+                        (campaign.status === "PREPARING" || campaign.status === "UPCOMING") && (
                           <button
-                            onClick={() =>
-                              handleCampaignAction(
-                                campaign.campaign_id,
-                                "cancel"
-                              )
-                            }
+                            onClick={() => handleCampaignAction(campaign.campaign_id, "cancel")}
                             disabled={isLoading}
                             className={`px-5 py-2.5 bg-red-700 hover:bg-red-800 text-white font-medium rounded-lg transition-colors duration-200 ${
                               isLoading ? "opacity-75 cursor-not-allowed" : ""

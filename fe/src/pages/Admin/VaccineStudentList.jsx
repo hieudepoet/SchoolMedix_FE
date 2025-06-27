@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Users,
   CheckCircle,
@@ -8,6 +7,7 @@ import {
   Loader2,
   ArrowLeft,
 } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import axiosClient from "../../config/axiosClient";
 
 const VaccineStudentList = () => {
@@ -18,26 +18,32 @@ const VaccineStudentList = () => {
   const [statusList, setStatusList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false); // New state for refresh loading
+
+  const fetchStudents = useCallback(async () => {
+    try {
+      setLoading(true);
+      setIsRefreshing(true);
+      const res = await axiosClient.get(`/vaccination-campaign/${id}/student-eligible`);
+      console.log("STUDENT LIST: ", res.data.data);
+      setStudentList(res.data.data);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching students:", err);
+      setError("Không thể tải danh sách học sinh");
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
+  }, [id]);
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        setLoading(true);
-        const res = await axiosClient.get(
-          "/vaccination-campaign/" + id + "/student-eligible"
-        );
-        console.log("STUDENT LIST: ", res.data.data);
-        setStudentList(res.data.data);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching students:", err);
-        setError("Không thể tải danh sách học sinh");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchStudents();
-  }, [id]);
+  }, [fetchStudents]);
+
+  const handleRefresh = () => {
+    fetchStudents();
+  };
 
   const getVaccinationStatus = (completedDoses, totalDoses) => {
     const completed = parseInt(completedDoses);
@@ -70,7 +76,24 @@ const VaccineStudentList = () => {
     }
   };
 
-  if (loading) {
+  const getRegisterStatus = (isRegistered) => {
+    if (isRegistered === null)
+      return {
+        label: "Không có đơn",
+        color: "text-gray-500 bg-gray-100",
+      };
+    if (isRegistered === false)
+      return {
+        label: "Chờ duyệt",
+        color: "text-yellow-800 bg-yellow-100",
+      };
+    return {
+      label: "Đã duyệt",
+      color: "text-green-800 bg-green-100",
+    };
+  };
+
+  if (loading && !isRefreshing) {
     return (
       <div className="p-6 max-w-6xl mx-auto">
         <div className="flex flex-col items-center justify-center py-16">
@@ -89,7 +112,7 @@ const VaccineStudentList = () => {
           <h3 className="text-lg font-semibold text-red-800 mb-2">Lỗi</h3>
           <p className="text-red-600 mb-4">{error}</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={handleRefresh}
             className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
           >
             Thử lại
@@ -103,33 +126,43 @@ const VaccineStudentList = () => {
     (s) => parseInt(s.completed_doses) >= parseInt(s.dose_quantity)
   ).length;
 
-  const getRegisterStatus = (isRegistered) => {
-    if (isRegistered === null)
-      return {
-        label: "Không có đơn",
-        color: "text-gray-500 bg-gray-100",
-      };
-    if (isRegistered === false)
-      return {
-        label: "Chờ duyệt",
-        color: "text-yellow-800 bg-yellow-100",
-      };
-    return {
-      label: "Đã duyệt",
-      color: "text-green-800 bg-green-100",
-    };
-  };
-
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      {/* Back Button */}
-      <div className="mb-6">
+      {/* Header with Back and Refresh Buttons */}
+      <div className="mb-6 flex justify-between items-center">
         <button
           onClick={() => navigate("/admin/vaccine-campaign/" + id)}
           className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
           <ArrowLeft className="w-4 h-4" />
           Quay lại
+        </button>
+        <button
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+          className={`flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 ${
+            isRefreshing ? "opacity-75 cursor-not-allowed" : ""
+          }`}
+        >
+          {isRefreshing ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+          )}
+          <span>Làm mới</span>
         </button>
       </div>
 
@@ -179,9 +212,7 @@ const VaccineStudentList = () => {
                   student.dose_quantity
                 );
                 const progress =
-                  (parseInt(student.completed_doses) /
-                    parseInt(student.dose_quantity)) *
-                  100;
+                  (parseInt(student.completed_doses) / parseInt(student.dose_quantity)) * 100;
 
                 return (
                   <tr

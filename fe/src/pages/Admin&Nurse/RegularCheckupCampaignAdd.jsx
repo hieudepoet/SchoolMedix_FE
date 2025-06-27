@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, Users, FileText, Plus, Check, ArrowLeft } from 'lucide-react';
 import axiosClient from '../../config/axiosClient';
 
-const AddRegularCheckupCampaign = () => {
+const RegularCheckupCampaignAdd = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -16,14 +16,30 @@ const AddRegularCheckupCampaign = () => {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [specialistExams, setSpecialistExams] = useState([]);
+  const [examLoading, setExamLoading] = useState(false);
+  const [examError, setExamError] = useState('');
 
-  // Specialist exam types from your data
-  const specialistExams = [
-    { id: 1, name: "Khám sinh dục", description: "Đánh giá sức khỏe sinh dục, đặc biệt ở lứa tuổi dậy thì." },
-    { id: 2, name: "Khám tâm lý", description: "Tư vấn tâm lý học đường, hỗ trợ điều chỉnh cảm xúc, hành vi." },
-    { id: 3, name: "Khám tâm thần", description: "Phát hiện các rối loạn tâm thần, cần bác sĩ chuyên khoa can thiệp." },
-    { id: 4, name: "Khám xâm lấn", description: "Các thủ thuật có can thiệp trực tiếp vào cơ thể như lấy máu xét nghiệm, tiêm phòng, sinh thiết." }
-  ];
+  // Fetch specialist exams from the backend
+  useEffect(() => {
+    const fetchSpecialistExams = async () => {
+      setExamLoading(true);
+      try {
+        const response = await axiosClient.get('/special-exam');
+        if (response.data.error) {
+          setExamError(response.data.message);
+        } else {
+          setSpecialistExams(response.data.data);
+        }
+      } catch (error) {
+        {error && setExamError('Lỗi khi lấy danh sách loại khám chuyên khoa.')};
+      } finally {
+        setExamLoading(false);
+      }
+    };
+
+    fetchSpecialistExams();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -70,11 +86,10 @@ const AddRegularCheckupCampaign = () => {
     try {
       const response = await axiosClient.post('/checkup-campaign', formData);
 
-      if (response.error) {
-        setMessage({ type: 'error', text: response.message });
+      if (response.data.error) {
+        setMessage({ type: 'error', text: response.data.message });
       } else {
         setMessage({ type: 'success', text: 'Tạo chiến dịch khám sức khỏe thành công!' });
-        // Reset form
         setFormData({
           name: '',
           description: '',
@@ -96,7 +111,7 @@ const AddRegularCheckupCampaign = () => {
   };
 
   return (
-    <div class Centennial="max-w-4xl mx-auto p-6 bg-white">
+    <div className="max-w-4xl mx-auto p-6 bg-white">
       <div className="mb-8">
         <button
           type="button"
@@ -127,6 +142,15 @@ const AddRegularCheckupCampaign = () => {
               <FileText className="w-5 h-5 mr-2" />
             )}
             {message.text}
+          </div>
+        </div>
+      )}
+
+      {examError && (
+        <div className="mb-6 p-4 rounded-lg border bg-red-50 border-red-200 text-red-700">
+          <div className="flex items-center">
+            <FileText className="w-5 h-5 mr-2" />
+            {examError}
           </div>
         </div>
       )}
@@ -240,40 +264,47 @@ const AddRegularCheckupCampaign = () => {
           <p className="text-sm text-gray-600 mb-4">
             Chọn các loại khám chuyên khoa sẽ được thực hiện trong chiến dịch này
           </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {specialistExams.map((exam) => (
-              <div
-                key={exam.id}
-                className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                  formData.specialist_exam_ids.includes(exam.id)
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-                onClick={() => handleExamToggle(exam.id)}
-              >
-                <div className="flex items-start">
-                  <div className={`w-5 h-5 rounded border-2 mr-3 mt-0.5 flex items-center justify-center ${
+
+          {examLoading ? (
+            <div className="flex items-center justify-center p-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <span className="ml-2 text-gray-600">Đang tải danh sách loại khám...</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {specialistExams.map((exam) => (
+                <div
+                  key={exam.id}
+                  className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
                     formData.specialist_exam_ids.includes(exam.id)
-                      ? 'border-blue-500 bg-blue-500'
-                      : 'border-gray-300'
-                  }`}>
-                    {formData.specialist_exam_ids.includes(exam.id) && (
-                      <Check className="w-3 h-3 text-white" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900 mb-1">
-                      {exam.name}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {exam.description}
-                    </p>
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                  onClick={() => handleExamToggle(exam.id)}
+                >
+                  <div className="flex items-start">
+                    <div className={`w-5 h-5 rounded border-2 mr-3 mt-0.5 flex items-center justify-center ${
+                      formData.specialist_exam_ids.includes(exam.id)
+                        ? 'border-blue-500 bg-blue-500'
+                        : 'border-gray-300'
+                    }`}>
+                      {formData.specialist_exam_ids.includes(exam.id) && (
+                        <Check className="w-3 h-3 text-white" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-medium text-gray-900 mb-1">
+                        {exam.name}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        {exam.description}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           {formData.specialist_exam_ids.length > 0 && (
             <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
@@ -327,4 +358,4 @@ const AddRegularCheckupCampaign = () => {
   );
 };
 
-export default AddRegularCheckupCampaign;
+export default RegularCheckupCampaignAdd;

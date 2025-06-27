@@ -28,7 +28,6 @@ import StudentRegularCheckup from "../pages/Parent/StudentRegularCheckup";
 import DiseaseRecordManagement from "../pages/Admin&Nurse/DiseaseRecordManagement";
 import DiseaseRecordOfChildrenManagement from "../pages/Parent/DiseaseRecordofChildrenManagement";
 import RegularCheckupDetails from "../pages/Admin&Nurse/RegularCheckupDetails";
-import AddRegularCheckupCampaign from "../pages/Admin&Nurse/AddRegularCheckupCampaign";
 import RegularCheckupRegisterList from "../pages/Admin&Nurse/RegularCheckupRegisterList";
 import RegularCheckupSurvey from "../pages/Parent/RegularCheckupSurvey";
 import CheckupCampaignReport from "../pages/Nurse/CheckupCampaignReport";
@@ -37,6 +36,7 @@ import CompletedRegularCheckupReport from "../pages/Admin&Nurse/CompletedRegular
 import SpecialtyManagement from "../pages/Admin&Nurse/SpecialtyManagement";
 import VaccineManagement from "../pages/Admin&Nurse/VaccineManagement";
 import SpecialistExamManagement from "../pages/Admin/SpecialistExamManagement";
+import RegularCheckupCampaignAdd from "../pages/Admin&Nurse/RegularCheckupCampaignAdd";
 
 const routes = createBrowserRouter([
   {
@@ -115,7 +115,7 @@ const routes = createBrowserRouter([
           },
           {
             path: "checkup-campaign-creation",
-            element: <AddRegularCheckupCampaign />,
+            element: <RegularCheckupCampaignAdd />,
           },
           {
             path: "checkup-campaign/:checkup_id/register-list",
