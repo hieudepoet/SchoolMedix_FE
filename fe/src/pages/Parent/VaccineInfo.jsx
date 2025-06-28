@@ -377,7 +377,7 @@ import SendVaccineReport from "./SendVaccineReport"; // Import component SendVac
 
 const VaccineInfo = () => {
   const [campaignList, setCampaignList] = useState([]);
-  const [registrationStatus, setRegistrationStatus] = useState({});
+  const [completedDoses, setCompletedDoses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currChild, setCurrChild] = useState(null);
@@ -397,28 +397,37 @@ const VaccineInfo = () => {
         }
         setCurrChild(child);
 
+        // Fetch danh sách chiến dịch
         const campaignRes = await axiosClient.get("/vaccination-campaign");
         const campaigns = campaignRes.data.data || [];
         setCampaignList(campaigns);
-        const registrationPromises = campaigns.map((campaign) =>
-          axiosClient
-            .get(`/student/${child.id}/vaccination-campaign/${campaign.campaign_id}/register`)
-            .then((res) => ({
-              campaign_id: campaign.campaign_id,
-              register: res.data.data[0] || null,
-            }))
-            .catch((err) => ({
-              campaign_id: campaign.campaign_id,
-              register: null,
-              error: err,
-            }))
-        );
-        const registrationResults = await Promise.all(registrationPromises);
-        const regStatus = registrationResults.reduce((acc, item) => {
-          acc[item.campaign_id] = item.register;
-          return acc;
-        }, {});
-        setRegistrationStatus(regStatus);
+// <<<<<<< HEAD
+//         const registrationPromises = campaigns.map((campaign) =>
+//           axiosClient
+//             .get(`/student/${child.id}/vaccination-campaign/${campaign.campaign_id}/register`)
+//             .then((res) => ({
+//               campaign_id: campaign.campaign_id,
+//               register: res.data.data[0] || null,
+//             }))
+//             .catch((err) => ({
+//               campaign_id: campaign.campaign_id,
+//               register: null,
+//               error: err,
+//             }))
+//         );
+//         const registrationResults = await Promise.all(registrationPromises);
+//         const regStatus = registrationResults.reduce((acc, item) => {
+//           acc[item.campaign_id] = item.register;
+//           return acc;
+//         }, {});
+//         setRegistrationStatus(regStatus);
+// =======
+
+        // Fetch thông tin liều đã tiêm
+        const dosesRes = await axiosClient.get(`/student/${child.id}/completed-doses`);
+        const dosesData = dosesRes.data.diseases || [];
+        setCompletedDoses(dosesData);
+
         setError(null);
       } catch (error) {
         setError("Failed to fetch data");
@@ -451,10 +460,16 @@ const VaccineInfo = () => {
     }
   };
 
-  const getCampaignStatus = (campaign, hasRegistration) => {
+  const getCampaignStatus = (campaign) => {
     const status = campaign.status?.toUpperCase();
+// <<<<<<< HEAD
 
-    if (status === "PREPARING" && !hasRegistration) {
+//     if (status === "PREPARING" && !hasRegistration) {
+// =======
+    const doseInfo = completedDoses.find((dose) => dose.disease_id === campaign.disease_id);
+    // Kiểm tra nếu disease_id khớp và completed_doses = dose_quantity
+    if (doseInfo && doseInfo.completed_doses === doseInfo.dose_quantity) {
+
       return {
         status: "Đã đủ mũi tiêm",
         className: "bg-green-100 text-green-900 border-green-400",
@@ -593,100 +608,84 @@ const VaccineInfo = () => {
       <div className="max-w-full mx-auto pt-10">
         {history ? (
           <div className="bg-white rounded-xl border border-gray-300 py-10 text-center shadow-md">
-            <VaccineRecordsInfo />
+            <VaccineRecordsInfo records={completedDoses} currChild={currChild} />
           </div>
         ) : (
           <>
             {campaignList.length === 0 ? (
-              <div className="bg-white rounded-xl border border-gray-300 p-12 text-center shadow-md">
-                <FileText className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <div className="bg-white rounded-xl border border-gray-300 p-6 text-center shadow-md">
+                <FileText className="w-12 h-12 text-gray-500 mx-auto mb-3" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">
                   Chưa có chiến dịch tiêm chủng
                 </h3>
-                <p className="text-gray-700">
+                <p className="text-gray-700 text-sm">
                   Hiện tại chưa có chiến dịch nào được tổ chức. Vui lòng quay
                   lại sau để cập nhật thông tin mới nhất.
                 </p>
               </div>
             ) : (
-              <div className="grid gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {campaignList.map((campaign) => {
-                  const register = registrationStatus[campaign.campaign_id];
-                  const hasRegistration = !!register;
-                  const statusInfo = getCampaignStatus(campaign, hasRegistration);
+                  const statusInfo = getCampaignStatus(campaign);
 
                   return (
                     <div
                       key={campaign.campaign_id}
-                      className="bg-white border border-gray-300 rounded-xl p-8 hover:border-gray-400 hover:shadow-lg transition-all duration-200"
+                      className="bg-white border border-gray-300 rounded-lg p-4 hover:border-gray-400 hover:shadow-md transition-all duration-200 h-full"
                     >
                       {/* Campaign Header */}
-                      <div className="flex items-start justify-between mb-6">
+                      <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-blue-50 rounded-lg border border-blue-200">
-                              <Shield className="w-5 h-5 text-blue-700" />
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="p-1 bg-blue-50 rounded-md border border-blue-200">
+                              <Shield className="w-4 h-4 text-blue-700" />
                             </div>
                             <div>
-                              <h3 className="text-xl font-semibold text-gray-900">
+                              <h3 className="text-base font-semibold text-gray-900">
                                 {campaign.vaccine_name ||
-                                  `Chiến dịch tiêm chủng #${campaign.campaign_id}`}
+                                  `Chiến dịch #${campaign.campaign_id}`}
                               </h3>
-                              <p className="text-sm text-gray-600 font-mono">
-                                Mã chiến dịch: {campaign.campaign_id}
+                              <p className="text-xs text-gray-600 font-mono">
+                                Mã: {campaign.campaign_id}
                               </p>
                             </div>
                           </div>
                         </div>
                         <span
-                          className={`px-4 py-2 rounded-full text-sm font-semibold border ${statusInfo.className}`}
+                          className={`px-2 py-1 rounded-full text-xs font-medium border ${statusInfo.className}`}
                         >
                           {statusInfo.status}
                         </span>
                       </div>
 
                       {/* Campaign Details Grid */}
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-                        <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                          <Calendar className="w-5 h-5 text-gray-700" />
+                      <div className="grid grid-cols-1 gap-2 mb-3">
+                        <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md border border-gray-200">
+                          <Calendar className="w-4 h-4 text-gray-700" />
                           <div>
-                            <p className="text-sm font-medium text-gray-900">
-                              Thời gian
-                            </p>
-                            <p className="text-sm text-gray-700">
-                              {formatDate(campaign.start_date)} -{" "}
-                              {formatDate(campaign.end_date)}
+                            <p className="text-xs font-medium text-gray-900">Thời gian</p>
+                            <p className="text-xs text-gray-700">
+                              {formatDate(campaign.start_date)} - {formatDate(campaign.end_date)}
                             </p>
                           </div>
                         </div>
 
                         {campaign.location && (
-                          <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <MapPin className="w-5 h-5 text-gray-700" />
+                          <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md border border-gray-200">
+                            <MapPin className="w-4 h-4 text-gray-700" />
                             <div>
-                              <p className="text-sm font-medium text-gray-900">
-                                Địa điểm
-                              </p>
-                              <p className="text-sm text-gray-700">
-                                {campaign.location}
-                              </p>
+                              <p className="text-xs font-medium text-gray-900">Địa điểm</p>
+                              <p className="text-xs text-gray-700">{campaign.location}</p>
                             </div>
                           </div>
                         )}
 
                         {campaign.target_group && (
-                          <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <Users className="w-5 h-5 text-gray-700" />
+                          <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md border border-gray-200">
+                            <Users className="w-4 h-4 text-gray-700" />
                             <div>
-                              <p className="text-sm font-medium text-gray-900">
-                                Đối tượng
-                              </p>
-                              <p Hawkins className="w-5 h-5 text-gray-700" />
-                              <div>
-                                <p className="text-sm text-gray-700">
-                                  {campaign.target_group}
-                                </p>
-                              </div>
+                              <p className="text-xs font-medium text-gray-900">Đối tượng</p>
+                              <p className="text-xs text-gray-700">{campaign.target_group}</p>
                             </div>
                           </div>
                         )}
@@ -694,32 +693,30 @@ const VaccineInfo = () => {
 
                       {/* Description */}
                       {campaign.description && (
-                        <div className="mb-6">
-                          <h4 className="text-sm font-medium text-gray-900 mb-2">
-                            Mô tả
-                          </h4>
-                          <p className="text-gray-800 leading-relaxed">
+                        <div className="mb-3">
+                          <h4 className="text-xs font-medium text-gray-900 mb-1">Mô tả</h4>
+                          <p className="text-gray-800 text-xs leading-tight">
                             {campaign.description}
                           </p>
                         </div>
                       )}
 
                       {/* Action Buttons */}
-                      <div className="flex justify-end pt-4 border-t border-gray-200">
+                      <div className="flex justify-end pt-2 border-t border-gray-200">
                         {statusInfo.canSurvey ? (
                           <button
                             onClick={() => handleSurvey(campaign.campaign_id)}
-                            className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm"
+                            className="inline-flex items-center gap-1 bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-blue-700 transition-colors shadow-sm"
                           >
-                            <ClipboardList className="w-4 h-4" />
+                            <ClipboardList className="w-3 h-3" />
                             Tham gia khảo sát
                           </button>
                         ) : (
                           <button
                             disabled
-                            className={`inline-flex items-center gap-2 ${statusInfo.className === 'bg-green-100 text-green-900 border-green-400' ? 'bg-green-100 text-green-900 border-green-400' : 'bg-gray-200 text-gray-600'} px-6 py-3 rounded-lg font-medium cursor-not-allowed`}
+                            className={`inline-flex items-center gap-1 ${statusInfo.className === 'bg-green-100 text-green-900 border-green-400' ? 'bg-green-100 text-green-900 border-green-400' : 'bg-gray-200 text-gray-600'} px-3 py-1.5 rounded-md text-xs font-medium cursor-not-allowed`}
                           >
-                            <ClipboardList className="w-4 h-4" />
+                            <ClipboardList className="w-3 h-3" />
                             {statusInfo.status}
                           </button>
                         )}

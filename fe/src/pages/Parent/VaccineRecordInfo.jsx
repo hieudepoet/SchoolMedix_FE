@@ -3,96 +3,52 @@ import { Syringe, Loader2, AlertCircle, ChevronDown, ChevronUp } from "lucide-re
 import axiosClient from "../../config/axiosClient";
 import VaccineDetailsDropdown from "./VaccineDetailsDropdown";
 
-const VaccineRecordInfo = () => {
-  const [records, setRecords] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [currChild, setCurrChild] = useState({});
+const VaccineRecordInfo = ({ records, currChild }) => {
   const [details, setDetails] = useState({});
   const [openDropdown, setOpenDropdown] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState({});
 
   useEffect(() => {
-    const child = JSON.parse(localStorage.getItem('selectedChild'));
-    if (child) {
-      setCurrChild(child);
-    }
-
     if (!currChild?.id) {
       setError("Không tìm thấy thông tin học sinh");
-      setLoading(false);
       return;
     }
-
-    const fetchRecords = async () => {
-      try {
-        setLoading(true);
-        const res = await axiosClient.get(`/student/${currChild.id}/completed-doses`);
-        const recordData = res.data.diseases || [];
-        setRecords(recordData);
-        setError(null);
-      } catch (error) {
-        console.error("Error fetching vaccination records:", error);
-        setError(error.response?.data?.message || "Không thể tải lịch sử tiêm chủng");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRecords();
   }, [currChild?.id]);
 
   const fetchDetails = async (diseaseId) => {
     if (!details[diseaseId]) {
       try {
-        setLoadingDetails(prev => ({ ...prev, [diseaseId]: true }));
-        // Cập nhật endpoint mới
+        setLoadingDetails((prev) => ({ ...prev, [diseaseId]: true }));
         const res = await axiosClient.get(`/student/${currChild.id}/disease/${diseaseId}/vaccination-record`);
-        const allRecords = res.data || [];
-        setDetails(prev => ({ ...prev, [diseaseId]: allRecords }));
+        const allRecords = res.data.data || [];
+        setDetails((prev) => ({ ...prev, [diseaseId]: allRecords }));
       } catch (error) {
         console.error("Error fetching vaccination details:", error);
       } finally {
-        setLoadingDetails(prev => ({ ...prev, [diseaseId]: false }));
+        setLoadingDetails((prev) => ({ ...prev, [diseaseId]: false }));
       }
     }
   };
 
   const toggleDropdown = (diseaseId) => {
-    const record = records.find(r => r.disease_id === diseaseId);
+    const record = records.find((r) => r.disease_id === diseaseId);
     if (record?.completed_doses > 0) {
       const isCurrentlyOpen = openDropdown === diseaseId;
       setOpenDropdown(isCurrentlyOpen ? null : diseaseId);
-      
+
       if (!isCurrentlyOpen && !details[diseaseId]) {
         fetchDetails(diseaseId);
       }
     }
   };
 
-  if (loading) {
-    return (
-      <div className="p-6 max-w-6xl mx-auto">
-        <div className="flex flex-col items-center justify-center py-16">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
-          <p className="text-gray-600">Đang tải lịch sử tiêm chủng...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
+  if (!records) {
     return (
       <div className="p-6 max-w-6xl mx-auto">
         <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-red-800 mb-2">Lỗi</h3>
-          <p className="text-red-600 mb-4">{error}</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Thử lại
-          </button>
+          <p className="text-red-600 mb-4">Không có dữ liệu lịch sử tiêm chủng</p>
         </div>
       </div>
     );
@@ -145,9 +101,9 @@ const VaccineRecordInfo = () => {
                       <td className="px-4 py-4 text-center text-sm text-gray-600">{record.completed_doses}</td>
                       <td className="px-4 py-4 text-center text-sm text-gray-600">{record.dose_quantity}</td>
                       <td className="px-4 py-4 text-center text-sm">
-                        {record.completed_doses == 0 ? (
+                        {record.completed_doses === 0 ? (
                           <span className="text-red-600 font-medium">Chưa tiêm</span>
-                        ) : record.completed_doses == record.dose_quantity ? (
+                        ) : record.completed_doses === record.dose_quantity ? (
                           <span className="text-green-600 font-medium">Đã tiêm đủ</span>
                         ) : (
                           <span className="text-yellow-600 font-medium">Chưa tiêm đủ</span>
