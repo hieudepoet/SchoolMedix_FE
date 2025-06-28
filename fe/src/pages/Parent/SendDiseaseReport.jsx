@@ -159,8 +159,8 @@ const SendDiseaseReport = ({ onClose }) => {
           required
         >
           <option value="">Chọn trạng thái</option>
-          <option value="RECOVERED">RECOVERED</option>
-          <option value="UNDER_TREATMENT">UNDER_TREATMENT</option>
+          <option value="RECOVERED">Đã khỏi</option>
+          <option value="UNDER_TREATMENT">Đang điều trị</option>
         </select>
         <button
           type="submit"
