@@ -118,16 +118,20 @@ const RegularCheckup = () => {
   };
 
   const getPrimaryActionConfig = (status, campaignId) => {
+    // Common action for both admin and nurse when campaign is ONGOING
+    if (status === "ONGOING") {
+      return {
+        text: "Chỉnh sửa báo cáo",
+        action: "edit-report",
+        className: "bg-indigo-700 hover:bg-indigo-800 text-white",
+        disabled: false,
+        onClick: () => navigate(`/${userRole}/regular-report/${campaignId}`),
+      };
+    }
+
+    // Nurse-specific actions
     if (userRole === "nurse") {
-      if (status === "ONGOING") {
-        return {
-          text: "Chỉnh sửa báo cáo",
-          action: "edit-report",
-          className: "bg-indigo-700 hover:bg-indigo-800 text-white",
-          disabled: false,
-          onClick: () => navigate("/nurse/regular-report/" + campaignId),
-        };
-      } else if (status === "DONE") {
+      if (status === "DONE") {
         return {
           text: "Xem báo cáo",
           action: "view-report",
@@ -139,6 +143,7 @@ const RegularCheckup = () => {
       return null;
     }
 
+    // Admin-specific actions
     switch (status) {
       case "PREPARING":
         return {
@@ -293,7 +298,7 @@ const RegularCheckup = () => {
         </div>
 
         <div className="space-y-4">
-          {campaignList.map((campaign) => {
+          {campaignList.map((campaign, index) => {
             const primaryAction = getPrimaryActionConfig(campaign.status, campaign.id);
             const isLoading = loadingActions[campaign.id];
 
@@ -377,10 +382,9 @@ const RegularCheckup = () => {
                     <div className="mt-6 pt-6 border-t border-slate-200 flex flex-wrap gap-3">
                       <button
                         className="px-5 py-2.5 bg-slate-600 hover:bg-slate-700 text-white font-medium rounded-lg transition-colors duration-200"
-                        onClick={() => navigate(`/${getUserRole()}/checkup-campaign/${campaign.id}`)}
+                        onClick={() => navigate(`/${getUserRole()}/checkup-campaign/${index}`)}
                       >
-                        <FileText className="w-4 h-4 inline mr-2" />
-                        Xem chi tiết
+                        <><FileText className="w-4 h-4 inline mr-2" /> Xem chi tiết</>
                       </button>
 
                       {primaryAction && (
@@ -417,8 +421,26 @@ const RegularCheckup = () => {
                             isLoading ? "opacity-75 cursor-not-allowed" : ""
                           } flex items-center space-x-2`}
                         >
-                          <XCircle className="w-4 h-4" />
-                          <span>Hủy chiến dịch</span>
+                          <><XCircle className="w-4 h-4" /> Hủy chiến dịch</>
+                        </button>
+                      )}
+
+                      {userRole === "admin" && campaign.status === "ONGOING" && (
+                        <button
+                          onClick={() => handleCampaignAction(campaign.id, "finish")}
+                          disabled={isLoading}
+                          className={`px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-medium rounded-lg transition-colors duration-200 ${
+                            isLoading ? "opacity-75 cursor-not-allowed" : ""
+                          } flex items-center space-x-2`}
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <span>Đang xử lý...</span>
+                            </>
+                          ) : (
+                            <span>Hoàn thành chiến dịch</span>
+                          )}
                         </button>
                       )}
                     </div>
@@ -445,8 +467,7 @@ const RegularCheckup = () => {
                 onClick={handleAddNewCampaign}
                 className="flex items-center space-x-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-colors duration-200 mx-auto"
               >
-                <Plus className="w-5 h-5" />
-                <span>Tạo chiến dịch đầu tiên</span>
+                <><Plus className="w-5 h-5" /> Tạo chiến dịch đầu tiên</>
               </button>
             )}
           </div>
